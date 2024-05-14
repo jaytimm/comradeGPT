@@ -1,4 +1,4 @@
-## comradeGPT
+# comradeGPT
 
 ``` r
 if (!require(pacman)) install.packages("pacman")
@@ -74,10 +74,32 @@ pmc_fulltext1 <- pmc_fulltext |>
     .groups = 'drop'  )
 ```
 
-myPackage/ ├── DESCRIPTION ├── NAMESPACE ├── R/ │ ├──
-cmd_process_document.R │ ├── cmd_get_consensus.R │ ├── utils.R ├── man/
+## Process/annotate texts
 
-## Classify study using abstract
+> The `cmd_process_document` function:
+
+> The `process_type` paramater specifies the relevant task, which simply
+> involves selecting the appropriate prompt structure under the hood.
+
+``` r
+process_type = c('classify_texts',
+                 'extract_variables',
+                 'extract_attributes',
+                 'extract_popchars',
+                 'manual'
+                 ## Table A
+                 ) 
+```
+
+Additionally,
+
+-   Ensures JSON output is properly formatted;
+
+-   Number of annotators to utilize;
+
+-   Parallel processing of annotation processes.
+
+### Classify study
 
 -   Subject Matter: Is the text discussing human subjects?
 
@@ -86,10 +108,11 @@ cmd_process_document.R │ ├── cmd_get_consensus.R │ ├── utils.R �
 -   Data Source: Is the data derived from real-world settings without
     manipulation?
 
-### Prompt
+#### Prompt
 
 ``` r
-wrapped_text <- strwrap(comradeGPT::cmd_prompts$user_classify_text, width = 50)
+wrapped_text <- strwrap(comradeGPT::cmd_prompts$user_classify_text, 
+                        width = 50)
 writeLines(wrapped_text)
 ```
 
@@ -133,32 +156,57 @@ writeLines(wrapped_text)
     ## TEXT:
 
 ``` r
-#######
 pp0 <- pmc_fulltext1 |> slice(1:3)
 
-xx <- comradeGPT::cmd_process_document(pmid = pp0$pmid,
-                                       text = pp0$json,
-                                       process_type = 'extract_variables',
-                                       annotators = 3, 
-                                       cores = 4 
-                                       )
+class <- comradeGPT::cmd_process_document(
+  pmid = pp0$pmid,
+  text = pp0$json,
+  process_type = 'classify_texts',
+  annotators = 3, 
+  cores = 4
+  )
 
-xx |> head() |> knitr::kable()
+class |> head() |> knitr::kable()
 ```
 
-| annotator_id | variable_name        | variable_type | explanation                                                     | mesh_descriptor      | pmid     |
-|:------|:----------|:-------|:------------------------------|:----------|:-----|
-| OTI2613      | Heart Failure        | OUTCOME       | Main outcome variable being predicted in the study.             | Heart Failure        | 28817241 |
-| OTI2613      | Vitamin D Deficiency | EXPOSURE      | Independent variable representing the exposure factor analyzed. | Vitamin D Deficiency | 28817241 |
-| OTI2613      | Age                  | COVARIATE     | Demographic variable used as a covariate in the analysis.       | Age                  | 28817241 |
-| OTI2613      | Gender               | COVARIATE     | Demographic variable used as a covariate in the analysis.       | Gender               | 28817241 |
-| OTI2613      | Education            | COVARIATE     | Sociodemographic variable used as a covariate in the analysis.  | Education            | 28817241 |
-| OTI2613      | Ethnicity            | COVARIATE     | Sociodemographic variable used as a covariate in the analysis.  | Ethnicity            | 28817241 |
+| annotator_id | question                | answer | explanation                                                                                                                                                                                                                                         | pmid     |
+|:---|:------|:--|:-------------------------------------------------------|:---|
+| OTI2613      | is_subject_human        | yes    | The study involves human subjects, specifically elderly patients from cardiology outpatient clinics.                                                                                                                                                | 28817241 |
+| OTI2613      | is_study_observational  | yes    | The study is observational as it assesses the association between vitamin D deficiency and the risk of heart failure without any intervention or manipulation of variables.                                                                         | 28817241 |
+| OTI2613      | is_data_from_real_world | yes    | The data for the study were derived from real-world settings, specifically from elderly patients seen in cardiology clinics, without any experimental manipulation.                                                                                 | 28817241 |
+| SNC1554      | is_subject_human        | yes    | The text discusses a study conducted on a group of older hypertensive patients with subjective memory complaints, focusing on cognitive performance, brain imaging, and blood pressure measurements.                                                | 29276677 |
+| SNC1554      | is_study_observational  | yes    | The study is classified as observational as it involves analyzing brain imaging data, cognitive tests, and blood pressure measurements in older hypertensive patients with memory complaints, without any intervention.                             | 29276677 |
+| SNC1554      | is_data_from_real_world | yes    | The data collected in the study are derived from real-world settings as part of the ADELAHYDE longitudinal single-center study on older hypertensive patients, reflecting clinical and imaging assessments conducted in a naturalistic environment. | 29276677 |
 
-## 1. Table A
+### Table A
 
-## 2. Population Characteristics
+### Population Characteristics
 
-## 3a. Variable extraction
+### Variable extraction
 
-## 3b. Variable attribute extraction
+``` r
+variables <- comradeGPT::cmd_process_document(
+  pmid = pp0$pmid,
+  text = pp0$json,
+  process_type = 'extract_variables',
+  annotators = 3, 
+  cores = 4
+  )
+
+variables |> head() |> knitr::kable()
+```
+
+| annotator_id | variable_name        | variable_type | explanation                                              | mesh_descriptor      | pmid     |
+|:-------|:-----------|:-------|:----------------------------|:-----------|:-----|
+| OTI2613      | Heart failure        | OUTCOME       | Main effect being predicted in the study.                | Heart failure        | 28817241 |
+| OTI2613      | Vitamin D deficiency | EXPOSURE      | Factor analyzed for association with heart failure risk. | Vitamin D Deficiency | 28817241 |
+| OTI2613      | Age                  | COVARIATE     | Demographic factor controlled for in the analysis.       | Age                  | 28817241 |
+| OTI2613      | Gender               | COVARIATE     | Demographic factor controlled for in the analysis.       | Sex                  | 28817241 |
+| OTI2613      | Education            | COVARIATE     | Demographic factor controlled for in the analysis.       | Education            | 28817241 |
+| OTI2613      | Ethnicity            | COVARIATE     | Demographic factor controlled for in the analysis.       | Ethnicity            | 28817241 |
+
+### Variable attribute extraction
+
+## Establishing consensus among annotators
+
+> As generic across annotation tasks
