@@ -76,7 +76,13 @@ pmc_fulltext1 <- pmc_fulltext |>
 
 ## Process/annotate texts
 
-> The `cmd_process_document` function:
+> The `cmd_process_document()` function:
+
+-   Ensures JSON output is properly formatted;
+
+-   Allows user to specify the number of annotators to utilize;
+
+-   Parallel processing of annotation processes.
 
 > The `process_type` paramater specifies the relevant task, which simply
 > involves selecting the appropriate prompt structure under the hood.
@@ -91,15 +97,7 @@ process_type = c('classify_texts',
                  ) 
 ```
 
-Additionally,
-
--   Ensures JSON output is properly formatted;
-
--   Number of annotators to utilize;
-
--   Parallel processing of annotation processes.
-
-### Classify study
+### 1. Classify study
 
 -   Subject Matter: Is the text discussing human subjects?
 
@@ -155,6 +153,8 @@ writeLines(wrapped_text)
     ## 
     ## TEXT:
 
+#### Function/API call
+
 ``` r
 pp0 <- pmc_fulltext1 |> slice(1:3)
 
@@ -169,20 +169,20 @@ class <- comradeGPT::cmd_process_document(
 class |> head() |> knitr::kable()
 ```
 
-| annotator_id | question                | answer | explanation                                                                                                                                                                                                                                         | pmid     |
-|:---|:------|:--|:-------------------------------------------------------|:---|
-| OTI2613      | is_subject_human        | yes    | The study involves human subjects, specifically elderly patients from cardiology outpatient clinics.                                                                                                                                                | 28817241 |
-| OTI2613      | is_study_observational  | yes    | The study is observational as it assesses the association between vitamin D deficiency and the risk of heart failure without any intervention or manipulation of variables.                                                                         | 28817241 |
-| OTI2613      | is_data_from_real_world | yes    | The data for the study were derived from real-world settings, specifically from elderly patients seen in cardiology clinics, without any experimental manipulation.                                                                                 | 28817241 |
-| SNC1554      | is_subject_human        | yes    | The text discusses a study conducted on a group of older hypertensive patients with subjective memory complaints, focusing on cognitive performance, brain imaging, and blood pressure measurements.                                                | 29276677 |
-| SNC1554      | is_study_observational  | yes    | The study is classified as observational as it involves analyzing brain imaging data, cognitive tests, and blood pressure measurements in older hypertensive patients with memory complaints, without any intervention.                             | 29276677 |
-| SNC1554      | is_data_from_real_world | yes    | The data collected in the study are derived from real-world settings as part of the ADELAHYDE longitudinal single-center study on older hypertensive patients, reflecting clinical and imaging assessments conducted in a naturalistic environment. | 29276677 |
+| annotator_id | question                | answer | explanation                                                                                                                                                                                                                                                                                  | pmid     |
+|:---|:-----|:--|:--------------------------------------------------------|:--|
+| OTI2613      | is_subject_human        | yes    | The text discusses the association between vitamin D deficiency and the risk of heart failure in elderly human patients from cardiology outpatient clinics.                                                                                                                                  | 28817241 |
+| OTI2613      | is_study_observational  | yes    | The study is observational as it involves the evaluation of clinical data collected from elderly patients without intervention.                                                                                                                                                              | 28817241 |
+| OTI2613      | is_data_from_real_world | yes    | The data were collected in real-world settings, specifically from cardiology outpatient clinics, without manipulation.                                                                                                                                                                       | 28817241 |
+| SNC1554      | is_subject_human        | yes    | The text discusses a group of older hypertensive patients with only subjective memory complaints. Sixty older hypertensive patients were included in the study.                                                                                                                              | 29276677 |
+| SNC1554      | is_study_observational  | yes    | The study is classified as observational as it involves brain imaging, cognitive tests, and blood pressure measurements in older hypertensive patients, without any intervention or manipulation of subjects.                                                                                | 29276677 |
+| SNC1554      | is_data_from_real_world | yes    | The data were derived from real-world settings, specifically from the ADELAHYDE longitudinal single-center study, involving medical examinations, brain imaging, neuropsychological tests, and blood pressure measurements in older hypertensive patients with subjective memory complaints. | 29276677 |
 
-### Table A
+### 2. Table A
 
-### Population Characteristics
+### 3. Population Characteristics
 
-### Variable extraction
+### 4. Variable extraction
 
 ``` r
 variables <- comradeGPT::cmd_process_document(
@@ -196,16 +196,16 @@ variables <- comradeGPT::cmd_process_document(
 variables |> head() |> knitr::kable()
 ```
 
-| annotator_id | variable_name        | variable_type | explanation                                              | mesh_descriptor      | pmid     |
-|:-------|:-----------|:-------|:----------------------------|:-----------|:-----|
-| OTI2613      | Heart failure        | OUTCOME       | Main effect being predicted in the study.                | Heart failure        | 28817241 |
-| OTI2613      | Vitamin D deficiency | EXPOSURE      | Factor analyzed for association with heart failure risk. | Vitamin D Deficiency | 28817241 |
-| OTI2613      | Age                  | COVARIATE     | Demographic factor controlled for in the analysis.       | Age                  | 28817241 |
-| OTI2613      | Gender               | COVARIATE     | Demographic factor controlled for in the analysis.       | Sex                  | 28817241 |
-| OTI2613      | Education            | COVARIATE     | Demographic factor controlled for in the analysis.       | Education            | 28817241 |
-| OTI2613      | Ethnicity            | COVARIATE     | Demographic factor controlled for in the analysis.       | Ethnicity            | 28817241 |
+| annotator_id | variable_name        | variable_type | explanation                                                  | mesh_descriptor      | pmid     |
+|:-------|:----------|:-------|:-----------------------------|:----------|:-----|
+| OTI2613      | Heart Failure        | OUTCOME       | Main health condition being predicted in the study.          | Heart Failure        | 28817241 |
+| OTI2613      | Vitamin D deficiency | EXPOSURE      | Factor analyzed for its association with heart failure risk. | Vitamin D Deficiency | 28817241 |
+| OTI2613      | Age                  | COVARIATE     | Demographic factor used to control for confounding effects.  | Age                  | 28817241 |
+| OTI2613      | Gender               | COVARIATE     | Demographic factor included as a covariate.                  | Gender               | 28817241 |
+| OTI2613      | Education            | COVARIATE     | Sociodemographic factor controlled for in the analyses.      | Education            | 28817241 |
+| OTI2613      | Ethnicity            | COVARIATE     | Baseline characteristic included as a covariate.             | Ethnicity            | 28817241 |
 
-### Variable attribute extraction
+### 5. Variable attribute extraction
 
 ## Establishing consensus among annotators
 
