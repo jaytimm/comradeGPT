@@ -74,6 +74,20 @@ pmc_fulltext1 <- pmc_fulltext |>
     .groups = 'drop'  )
 ```
 
+``` r
+substr(pmc_fulltext1$json[2], 1, 3000) |> cat()
+```
+
+    ## [
+    ##   [
+    ##     {
+    ##       "section": "Abstract",
+    ##       "text": "Mild cognitive impairment and Alzheimer's dementia involve a grey matter disease, quantifiable by 18F-Fluorodeoxyglucose positron emission tomography (FDG-PET), but also white matter damage, evidenced by diffusion tensor magnetic resonance imaging (DTI), which may play an additional pathogenic role. This study aimed to determine whether such DTI and PET variations are also interrelated in a high-risk population of older hypertensive patients with only subjective memory complaints (SMC). Sixty older hypertensive patients (75 ± 5 years) with SMC were referred to DTI and FDG-PET brain imaging, executive and memory tests, as well as peripheral and central blood pressure (BP) measurements. Mean apparent diffusion coefficient (ADCmean) was determined in overall white matter and correlated with the grey matter distribution of the metabolic rate of glucose (CMRGlc) using whole-brain voxel-based analyses of FDG-PET images. ADCmean was variable between individuals, ranging from 0.82 to 1.01.10- 3 mm2 sec- 1, and mainly in relation with CMRGlc of areas involved in Alzheimer's disease such as internal temporal areas, posterior associative junctions, posterior cingulum but also insulo-opercular areas (global correlation coefficient: - 0.577, p < 0.001). Both the ADCmean and CMRGlc of the interrelated grey matter areas were additionally and concordantly linked to the results of executive and memory tests and to systolic central BP (all p < 0.05). Altogether, our findings show that cross-sectional variations in overall white brain matter are linked to the metabolism of Alzheimer-like cortical areas and to cognitive performance in older hypertensive patients with only subjective memory complaints. Additional relationships with central BP strengthen the hypothesis of a contributing pathogenic role of hypertension."
+    ##     },
+    ##     {
+    ##       "section": "Introduction",
+    ##       "text": "1Introduction\nSubjective cognitive impairment (SCI) is common in the elderly, and may serve as a symptomatic indicator of a precursor stage of Alzheimer's dementia (AD), even if subtle cognitive decline is difficult to detect on standardized cognitive testing (Jessen et al., 2014). While this condition is not considered to be a definite neurodegenerative process such as mild cognitive impairment (MCI) or AD, it may precede a further cognitive decline and the development of dementia (Kielb et al., 2017).In addition, impaired cognitive performance has been associated with cardiovascular (CV) risk factors such as hypertension (Ferreira et al., 2017, Muller et al., 2007, Rafnsson et al., 2007), in keeping with our recent observation that brain remodeling with age is linked to the level of central pulse pressure (Verger et al., 2015). Thus, older hypertensive patients with SCI may constitute a particularly high-risk group for subsequent dementia and may therefore benefit from dedicated modalities of medical management and of early diagnosis.
+
 ## Process/annotate texts
 
 > The `cmd_process_document()` function:
@@ -109,9 +123,9 @@ process_type = c('classify_texts',
 #### Prompt
 
 ``` r
-wrapped_text <- strwrap(comradeGPT::cmd_prompts$user_classify_text, 
-                        width = 50)
-writeLines(wrapped_text)
+t1 <- strwrap(comradeGPT::cmd_prompts$user_classify_text, 
+              width = 50)
+writeLines(t1)
 ```
 
     ## Your task is to classify scientific texts by
@@ -169,14 +183,14 @@ class <- comradeGPT::cmd_process_document(
 class |> head() |> knitr::kable()
 ```
 
-| annotator_id | question                | answer | explanation                                                                                                                                                                                                                                 | pmid     |
-|:---|:------|:--|:------------------------------------------------------|:---|
-| OTI2613      | is_subject_human        | yes    | The text discusses elderly patients who were subjects in the study conducted at cardiology outpatient clinics.                                                                                                                              | 28817241 |
-| OTI2613      | is_study_observational  | yes    | The study is observational as it evaluates the association between vitamin D deficiency and risk of heart failure without any intervention on the participants.                                                                             | 28817241 |
-| OTI2613      | is_data_from_real_world | yes    | The data were collected in real-world settings, specifically from cardiology outpatient clinics of a hospital, involving the analysis of clinical and sociodemographic characteristics of elderly patients.                                 | 28817241 |
-| SNC1554      | is_subject_human        | yes    | The text discusses a study involving older hypertensive patients with subjective memory complaints, focusing on brain imaging, cognitive tests, and blood pressure measurements.                                                            | 29276677 |
-| SNC1554      | is_study_observational  | yes    | The study is observational as it involves imaging data collection, cognitive assessments, and blood pressure measurements without any intervention on the participants.                                                                     | 29276677 |
-| SNC1554      | is_data_from_real_world | yes    | The data in the study were derived from real-world settings, such as clinical examinations, brain imaging, neuropsychological assessments, and blood pressure measurements conducted on older hypertensive patients with memory complaints. | 29276677 |
+| annotator_id | question                | answer | explanation                                                                                                                                                                                                                                                                                 | pmid     |
+|:---|:-----|:--|:--------------------------------------------------------|:--|
+| OTI2613      | is_subject_human        | yes    | The text discusses the association between vitamin D deficiency and the risk of heart failure in elderly patients attending cardiology outpatient clinics, involving the evaluation of clinical data and health outcomes in human participants.                                             | 28817241 |
+| OTI2613      | is_study_observational  | yes    | The study is observational as it involves assessing the relationship between vitamin D deficiency and heart failure risk in elderly patients without any intervention on their conditions.                                                                                                  | 28817241 |
+| OTI2613      | is_data_from_real_world | yes    | The data for this study were collected from real-world settings, specifically cardiology outpatient clinics and elderly care centers, without any artificial manipulation or experimental intervention.                                                                                     | 28817241 |
+| SNC1554      | is_subject_human        | yes    | The study involves human participants, specifically older hypertensive patients with only subjective memory complaints, who underwent DTI and FDG-PET brain imaging, executive and memory tests, as well as blood pressure measurements.                                                    | 29276677 |
+| SNC1554      | is_study_observational  | yes    | The study is observational as it focuses on analyzing interrelationships between DTI and FDG-PET imaging data, cognitive test results, and blood pressure parameters in older hypertensive patients with subjective memory complaints, without intervening or altering their conditions.    | 29276677 |
+| SNC1554      | is_data_from_real_world | yes    | The data were derived from a real-world setting, specifically the ADELAHYDE longitudinal single-center study, and involved actual measurements from medical examinations, imaging procedures, neuropsychological tests, and blood pressure assessments conducted on the study participants. | 29276677 |
 
 ### 2. Table A
 
@@ -187,9 +201,9 @@ class |> head() |> knitr::kable()
 #### Prompt
 
 ``` r
-wrapped_text <- strwrap(comradeGPT::cmd_prompts$user_extract_variables, 
-                        width = 50)
-writeLines(wrapped_text)
+t2 <- strwrap(comradeGPT::cmd_prompts$user_extract_variables, 
+              width = 50)
+writeLines(t2)
 ```
 
     ## Task: Extract all EXPOSURE, OUTCOME, and
@@ -292,23 +306,23 @@ variables <- comradeGPT::cmd_process_document(
 variables |> head() |> knitr::kable()
 ```
 
-| annotator_id | variable_name        | variable_type | explanation                                                | mesh_descriptor      | pmid     |
-|:-------|:----------|:-------|:----------------------------|:----------|:-----|
-| OTI2613      | Heart Failure        | OUTCOME       | Main health condition being predicted in the study.        | Heart Failure        | 28817241 |
-| OTI2613      | Vitamin D deficiency | EXPOSURE      | Factor analyzed for its potential effect on heart failure. | Vitamin D Deficiency | 28817241 |
-| OTI2613      | Age                  | COVARIATE     | Demographic factor controlled for in the analysis.         | Age Factors          | 28817241 |
-| OTI2613      | Gender               | COVARIATE     | Demographic factor controlled for in the analysis.         | Sex Factors          | 28817241 |
-| OTI2613      | Education            | COVARIATE     | Demographic factor controlled for in the analysis.         | Education            | 28817241 |
-| OTI2613      | Ethnicity            | COVARIATE     | Demographic factor controlled for in the analysis.         | Ethnic Groups        | 28817241 |
+| annotator_id | variable_name        | variable_type | explanation                                                                    | mesh_descriptor      | pmid     |
+|:------|:---------|:------|:---------------------------------|:---------|:----|
+| OTI2613      | Heart Failure        | OUTCOME       | The main health condition being predicted in the study.                        | Heart Failure        | 28817241 |
+| OTI2613      | Vitamin D deficiency | EXPOSURE      | Independent variable investigated for its association with heart failure risk. | Vitamin D Deficiency | 28817241 |
+| OTI2613      | Age                  | COVARIATE     | Demographic factor included in the analysis to control for confounding.        | age                  | 28817241 |
+| OTI2613      | Gender               | COVARIATE     | Demographic factor included in the analysis to control for confounding.        | gender               | 28817241 |
+| OTI2613      | Education            | COVARIATE     | Demographic factor included in the analysis to control for confounding.        | education            | 28817241 |
+| OTI2613      | Ethnicity            | COVARIATE     | Demographic factor included in the analysis to control for confounding.        | ethnicity            | 28817241 |
 
 ### 5. Variable attribute extraction
 
 #### Prompt
 
 ``` r
-wrapped_text <- strwrap(comradeGPT::cmd_prompts$user_extract_attributes, 
-                        width = 50)
-writeLines(wrapped_text)
+t3 <- strwrap(comradeGPT::cmd_prompts$user_extract_attributes, 
+              width = 50)
+writeLines(t3)
 ```
 
     ## You are tasked with creating a JSON output that
@@ -425,3 +439,5 @@ writeLines(wrapped_text)
 ## Establishing consensus among annotators
 
 > As generic across annotation tasks
+
+> Functionally, a crowd-sourced normalization procedure
