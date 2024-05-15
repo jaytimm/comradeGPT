@@ -1,5 +1,18 @@
 # comradeGPT
 
+## Installation
+
+Get the development version from GitHub with:
+
+``` r
+remotes::install_github("jaytimm/comradeGPT")
+```
+
+    ## Skipping install of 'comradeGPT' from a github remote, the SHA1 (61bc46e6) has not changed since last install.
+    ##   Use `force = TRUE` to force installation
+
+------------------------------------------------------------------------
+
 ``` r
 if (!require(pacman)) install.packages("pacman")
 pacman::p_load(puremoe,
@@ -170,7 +183,7 @@ writeLines(t1)
 #### Function/API call
 
 ``` r
-pp0 <- pmc_fulltext1 |> slice(1:3)
+pp0 <- pmc_fulltext1 |> slice(1:5)
 
 class <- comradeGPT::cmd_process_document(
   pmid = pp0$pmid,
@@ -183,14 +196,14 @@ class <- comradeGPT::cmd_process_document(
 class |> head() |> knitr::kable()
 ```
 
-| annotator_id | question                | answer | explanation                                                                                                                                                                                                                                                                                 | pmid     |
-|:---|:-----|:--|:--------------------------------------------------------|:--|
-| OTI2613      | is_subject_human        | yes    | The text discusses the association between vitamin D deficiency and the risk of heart failure in elderly patients attending cardiology outpatient clinics, involving the evaluation of clinical data and health outcomes in human participants.                                             | 28817241 |
-| OTI2613      | is_study_observational  | yes    | The study is observational as it involves assessing the relationship between vitamin D deficiency and heart failure risk in elderly patients without any intervention on their conditions.                                                                                                  | 28817241 |
-| OTI2613      | is_data_from_real_world | yes    | The data for this study were collected from real-world settings, specifically cardiology outpatient clinics and elderly care centers, without any artificial manipulation or experimental intervention.                                                                                     | 28817241 |
-| SNC1554      | is_subject_human        | yes    | The study involves human participants, specifically older hypertensive patients with only subjective memory complaints, who underwent DTI and FDG-PET brain imaging, executive and memory tests, as well as blood pressure measurements.                                                    | 29276677 |
-| SNC1554      | is_study_observational  | yes    | The study is observational as it focuses on analyzing interrelationships between DTI and FDG-PET imaging data, cognitive test results, and blood pressure parameters in older hypertensive patients with subjective memory complaints, without intervening or altering their conditions.    | 29276677 |
-| SNC1554      | is_data_from_real_world | yes    | The data were derived from a real-world setting, specifically the ADELAHYDE longitudinal single-center study, and involved actual measurements from medical examinations, imaging procedures, neuropsychological tests, and blood pressure assessments conducted on the study participants. | 29276677 |
+| annotator_id | question                | answer | explanation                                                                                                                                                                                                                                        | pmid     |
+|:---|:------|:--|:-------------------------------------------------------|:---|
+| OSG1216      | is_subject_human        | yes    | The text discusses elderly human patients in a cardiology outpatient clinic, evaluating the association between vitamin D deficiency and the risk of heart failure.                                                                                | 28817241 |
+| OSG1216      | is_study_observational  | yes    | The study is observational as it involves analyzing clinical data collected from elderly patients over a specified period without any intervention.                                                                                                | 28817241 |
+| OSG1216      | is_data_from_real_world | yes    | The data were derived from real-world settings, specifically from the Care Center for the Elderly and the outpatient clinic of cardiology of the Hospital das Clínicas, without experimental manipulation.                                         | 28817241 |
+| SYU9156      | is_subject_human        | yes    | The text discusses a study involving older hypertensive patients with subjective memory complaints, focusing on brain imaging, cognitive tests, and blood pressure measurements.                                                                   | 29276677 |
+| SYU9156      | is_study_observational  | yes    | The study is observational as it analyzes the interrelation between diffusion tensor imaging (DTI) and 18F-Fluorodeoxyglucose positron emission tomography (FDG-PET) variations in a high-risk population without intervening.                     | 29276677 |
+| SYU9156      | is_data_from_real_world | yes    | The data were sourced from real-world settings involving older hypertensive patients with subjective memory complaints, undergoing brain imaging, neuropsychological tests, and blood pressure measurements in a longitudinal single-center study. | 29276677 |
 
 ### 2. Table A
 
@@ -299,23 +312,26 @@ variables <- comradeGPT::cmd_process_document(
   pmid = pp0$pmid,
   text = pp0$json,
   process_type = 'extract_variables',
-  annotators = 3, 
-  cores = 4
+  annotators = 5, 
+  cores = parallel::detectCores() - 1
   )
 
 variables |> head() |> knitr::kable()
 ```
 
-| annotator_id | variable_name        | variable_type | explanation                                                                    | mesh_descriptor      | pmid     |
-|:------|:---------|:------|:---------------------------------|:---------|:----|
-| OTI2613      | Heart Failure        | OUTCOME       | The main health condition being predicted in the study.                        | Heart Failure        | 28817241 |
-| OTI2613      | Vitamin D deficiency | EXPOSURE      | Independent variable investigated for its association with heart failure risk. | Vitamin D Deficiency | 28817241 |
-| OTI2613      | Age                  | COVARIATE     | Demographic factor included in the analysis to control for confounding.        | age                  | 28817241 |
-| OTI2613      | Gender               | COVARIATE     | Demographic factor included in the analysis to control for confounding.        | gender               | 28817241 |
-| OTI2613      | Education            | COVARIATE     | Demographic factor included in the analysis to control for confounding.        | education            | 28817241 |
-| OTI2613      | Ethnicity            | COVARIATE     | Demographic factor included in the analysis to control for confounding.        | ethnicity            | 28817241 |
+| annotator_id | variable_name        | variable_type | explanation                                                  | mesh_descriptor      | pmid     |
+|:-------|:----------|:-------|:-----------------------------|:----------|:-----|
+| OSM5611      | Heart Failure        | OUTCOME       | Main effect being predicted or explained in the study.       | Heart Failure        | 28817241 |
+| OSM5611      | Vitamin D deficiency | EXPOSURE      | Factor analyzed for potential effects on heart failure risk. | Vitamin D Deficiency | 28817241 |
+| OSM5611      | Age                  | COVARIATE     | Factor controlled for in the analysis.                       | Age                  | 28817241 |
+| OSM5611      | Gender               | COVARIATE     | Factor controlled for in the analysis.                       | Gender               | 28817241 |
+| OSM5611      | Education            | COVARIATE     | Factor controlled for in the analysis.                       | Education            | 28817241 |
+| OSM5611      | Ethnicity            | COVARIATE     | Factor controlled for in the analysis.                       | Ethnicity            | 28817241 |
 
 ### 5. Variable attribute extraction
+
+> NOTE – this will be more challenging than initially thought –
+> specifically WRT aligning PMIDs in variable list with PMIDs in text –
 
 #### Prompt
 
@@ -436,8 +452,121 @@ writeLines(t3)
     ## element. DO NOT include the "```json " code block
     ## notation in the output.
 
-## Establishing consensus among annotators
+## Evaluation Framework
 
-> As generic across annotation tasks
+### Precision Calculation:
 
-> Functionally, a crowd-sourced normalization procedure
+-   Purpose: To measure the consistency with which LLM annotators
+    identify specific variables.
+
+-   Calculation: Precision is calculated as the proportion of annotators
+    who identified a specific variable out of the total number of
+    annotators.
+
+### Consensus Variables:
+
+-   Definition: Variables that have a high precision (e.g., precision ≥
+    60%).
+
+-   Purpose: To form a reliable set of variables that most LLM
+    annotators agree upon, reflecting strong consensus.
+
+### Consensus Annotations:
+
+-   Definition: An aggregate annotation derived from the consensus
+    variables.
+
+-   Purpose: To create a reference standard based on the most
+    consistently identified variables by LLM annotators.
+
+### Inter-Rater Agreement:
+
+-   Purpose: To measure the overall agreement among LLM annotators
+    across all variables.
+
+-   Metrics: Use Fleiss’ Kappa or Krippendorff’s Alpha to assess the
+    level of agreement, adjusting for chance agreement.
+
+### Accuracy of LLM-Based Annotations:
+
+-   Definition: The agreement between human annotations and consensus
+    annotations generated by a Large Language Model (LLM).
+
+-   Purpose: To evaluate the performance of LLM-based consensus
+    annotation against a human-derived standard.
+
+-   Metrics: Use Cohen’s Kappa or a similar metric to compare the binary
+    presence/absence of variables between human and LLM annotations.
+
+### Conceptual Framework Diagram
+
+<table style="width:51%;">
+<colgroup>
+<col style="width: 51%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><pre><code>      Annotator Data</code></pre></td>
+</tr>
+</tbody>
+</table>
+
+            |
+            v
+
+<table style="width:51%;">
+<colgroup>
+<col style="width: 51%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><pre><code>   Calculate Precision</code></pre>
+<p>(Proportion of annotators who identified each variable)</p></td>
+</tr>
+</tbody>
+</table>
+
+            |
+            v
+
+<table style="width:51%;">
+<colgroup>
+<col style="width: 51%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><pre><code>  Determine Consensus
+ Variables (Precision ≥ 60%)</code></pre></td>
+</tr>
+</tbody>
+</table>
+
+            |
+            v
+
+<table style="width:53%;">
+<colgroup>
+<col style="width: 52%" />
+</colgroup>
+<tbody>
+<tr class="odd">
+<td><pre><code>  Generate Consensus           |
+     Annotations               |</code></pre>
+<p>(Aggregate high-precision variables)</p></td>
+</tr>
+</tbody>
+</table>
+
+            |
+            v
+
+|                                                                                               |
+|--------------------------------------|
+| Calculate Inter-Rater Agreement \| (Fleiss’ Kappa, Krippendorff’s Alpha) among LLM annotators |
+
+            |
+            v
+
+|                                                                                                                  |
+|--------------------------------------|
+| Accuracy of LLM-Based Annotations (Compare human annotations with Consensus LLM annotations using Cohen’s Kappa) |
