@@ -8,9 +8,6 @@ Get the development version from GitHub with:
 remotes::install_github("jaytimm/comradeGPT")
 ```
 
-    ## Skipping install of 'comradeGPT' from a github remote, the SHA1 (73aed9b3) has not changed since last install.
-    ##   Use `force = TRUE` to force installation
-
 ------------------------------------------------------------------------
 
 ``` r
@@ -85,6 +82,8 @@ pmc_fulltext1 <- pmc_fulltext |>
                             pretty = TRUE, 
                             auto_unbox = TRUE),
     .groups = 'drop'  )
+
+pp0 <- pmc_fulltext1 |> slice(1:10)
 ```
 
 ``` r
@@ -183,8 +182,6 @@ writeLines(t1)
 #### Function/API call
 
 ``` r
-pp0 <- pmc_fulltext1 |> slice(1:5)
-
 class <- comradeGPT::cmd_process_document(
   pmid = pp0$pmid,
   text = pp0$json,
@@ -195,15 +192,6 @@ class <- comradeGPT::cmd_process_document(
 
 class |> head() |> knitr::kable()
 ```
-
-| annotator_id | question                | answer | explanation                                                                                                                                                                                                                                                                                                                                        | pmid     |
-|:---|:-----|:--|:----------------------------------------------------------|:--|
-| OSG1216      | is_subject_human        | yes    | The text discusses the association between vitamin D deficiency and the risk of heart failure in elderly patients from cardiology outpatient clinics. Data was collected from elderly individuals, and the study was conducted at the Care Center for the Elderly and the outpatient clinic of cardiology in a hospital, involving human subjects. | 28817241 |
-| OSG1216      | is_study_observational  | yes    | The study is observational as it involves assessing the association between vitamin D deficiency and the risk of heart failure in elderly patients. Data was collected from clinical records and through tests on the participants without intervention or manipulation of their conditions.                                                       | 28817241 |
-| OSG1216      | is_data_from_real_world | yes    | The data in this study were derived from real-world settings, specifically from the Care Center for the Elderly and the cardiology outpatient clinic of a hospital. The data collection spanned from August 2015 to February 2016 and was based on clinical records and laboratory tests in a natural setting without experimental manipulation.   | 28817241 |
-| SYU9156      | is_subject_human        | yes    | The text discusses a study conducted on humans, specifically older hypertensive patients with subjective memory complaints.                                                                                                                                                                                                                        | 29276677 |
-| SYU9156      | is_study_observational  | yes    | The study is observational as it involves examining the interrelationship between diffusion tensor imaging (DTI) and 18F-Fluorodeoxyglucose positron emission tomography (FDG-PET) variations in a high-risk population.                                                                                                                           | 29276677 |
-| SYU9156      | is_data_from_real_world | yes    | The data in the study are derived from real-world settings, where older hypertensive patients with subjective memory complaints were examined using DTI, FDG-PET, neuropsychological tests, and blood pressure measurements.                                                                                                                       | 29276677 |
 
 ### 2. Table A
 
@@ -313,25 +301,75 @@ variables <- comradeGPT::cmd_process_document(
   text = pp0$json,
   process_type = 'extract_variables',
   annotators = 5, 
-  cores = parallel::detectCores() - 1
+  cores = 10
   )
 
 variables |> head() |> knitr::kable()
 ```
 
-| annotator_id | variable_name        | variable_type | explanation                                              | mesh_descriptor      | pmid     |
-|:-------|:-----------|:-------|:----------------------------|:-----------|:-----|
-| OSM5611      | Heart Failure        | OUTCOME       | Main effect or condition being explained in the study.   | Heart Failure        | 28817241 |
-| OSM5611      | Vitamin D Deficiency | EXPOSURE      | Factor analyzed for association with heart failure risk. | Vitamin D Deficiency | 28817241 |
-| OSM5611      | Age                  | COVARIATE     | Demographic factor controlled for in the analysis.       | Age                  | 28817241 |
-| OSM5611      | Gender               | COVARIATE     | Demographic factor controlled for in the analysis.       | Gender               | 28817241 |
-| OSM5611      | Education            | COVARIATE     | Sociodemographic factor controlled for in the analysis.  | Education            | 28817241 |
-| OSM5611      | Ethnicity            | COVARIATE     | Sociodemographic factor controlled for in the analysis.  | Ethnicity            | 28817241 |
+| pmid     | annotator_id | variable_name        | variable_type | explanation                                                                  | mesh_descriptor      |
+|:----|:------|:---------|:------|:---------------------------------|:---------|
+| 28817241 | OMO5232      | Heart Failure        | OUTCOME       | Main outcome variable in the study related to heart failure risk assessment. | Heart Failure        |
+| 28817241 | OMO5232      | Vitamin D deficiency | EXPOSURE      | Independent variable related to the risk of heart failure.                   | Vitamin D Deficiency |
+| 28817241 | OMO5232      | Age                  | COVARIATE     | Covariate considering the age of the elderly participants.                   | Age                  |
+| 28817241 | OMO5232      | Gender               | COVARIATE     | Covariate representing the gender of the elderly participants.               | Gender               |
+| 28817241 | OMO5232      | Education            | COVARIATE     | Covariate indicating the educational level of the elderly participants.      | Education            |
+| 28817241 | OMO5232      | Ethnicity            | COVARIATE     | Covariate describing the ethnic background of the elderly participants.      | Ethnic Groups        |
 
 ### 5. Variable attribute extraction
 
 > NOTE – this will be more challenging than initially thought –
 > specifically WRT aligning PMIDs in variable list with PMIDs in text –
+
+``` r
+sample_characteristics <- list(
+  Biology_Genetics = list(
+    "Biology/Genetics"
+  ),
+  Family_Planning = list(
+    "1st trimester care",
+    "Use of ART"
+  ),
+  Health_Behaviors = list(
+    "Drinking",
+    "Smoking",
+    "Substance use"
+  ),
+  Implicit_Racial_Bias = list(
+    "Structural racism"
+  ),
+  Reproductive_Hx = list(
+    "Hx of abortion",
+    "Hx of pregnancy loss",
+    "Hx of perinatal death",
+    "Hx of preterm birth",
+    "Parity/Gravidity",
+    "Previous C-section",
+    "Previous birth weight",
+    "Prior pregnancy outcome"
+  ),
+  Sociodemographics = list(
+    "Geographic area",
+    "Maternal age",
+    "Marital status",
+    "Race/ethnicity",
+    "Paternity"
+  ),
+  Socioeconomics = list(
+    "Education",
+    "Insurance",
+    "Income assistance",
+    "SES category"
+  ),
+  Underlying_Health = list(
+    "Chronic diseases",
+    "Diabetes",
+    "Hypertension",
+    "Maternal weight",
+    "Maternal BMI"
+  )
+)
+```
 
 #### Prompt
 
@@ -454,6 +492,9 @@ writeLines(t3)
 
 ## Evaluation Framework
 
+> this is very specific to variables at present – needs to be made
+> generic to all task types –
+
 ### Precision Calculation:
 
 -   Purpose: To measure the consistency with which LLM annotators
@@ -462,6 +503,20 @@ writeLines(t3)
 -   Calculation: Precision is calculated as the proportion of annotators
     who identified a specific variable out of the total number of
     annotators.
+
+``` r
+precision <- variables |> comradeGPT::cmd_calc_precision(cols = c('variable_name', 'variable_type'))
+precision |> head() |> knitr::kable()
+```
+
+| pmid     | variable_name        | variable_type | annotators | var_freq | agree_rate |
+|:--------|:-------------------|:-------------|----------:|--------:|----------:|
+| 28817241 | HEART FAILURE        | OUTCOME       |          5 |        5 |          1 |
+| 28817241 | VITAMIN D DEFICIENCY | EXPOSURE      |          5 |        5 |          1 |
+| 28817241 | AGE                  | COVARIATE     |          5 |        5 |          1 |
+| 28817241 | GENDER               | COVARIATE     |          5 |        5 |          1 |
+| 28817241 | EDUCATION            | COVARIATE     |          5 |        5 |          1 |
+| 28817241 | ETHNICITY            | COVARIATE     |          5 |        5 |          1 |
 
 ### Consensus Variables:
 
@@ -486,6 +541,26 @@ writeLines(t3)
 
 -   Metrics: Use Fleiss’ Kappa or Krippendorff’s Alpha to assess the
     level of agreement, adjusting for chance agreement.
+
+``` r
+# 30180830
+agreement <- variables |> 
+  comradeGPT::cmd_calc_agreement(cols = c('variable_name', 'variable_type'))
+agreement |> knitr::kable()
+```
+
+| pmid     | kappa |   z | p_value | annotators | type | token | min_vars | max_vars | mean_vars | rate_consensus | n_consensus_vars |
+|:-----|----:|---:|-----:|------:|---:|----:|-----:|-----:|------:|---------:|----------:|
+| 28817241 | 0.579 | 8.2 | 0.00000 |          5 |   20 |    95 |       19 |       19 |      19.0 |          0.990 |               19 |
+| 29276677 | 0.101 | 1.8 | 0.07174 |          5 |   30 |    57 |        8 |       14 |      11.9 |          0.491 |                7 |
+| 29330643 | 0.237 | 3.9 | 0.00010 |          5 |   26 |    79 |        9 |       18 |      16.5 |          0.835 |               16 |
+| 29574441 | 0.047 | 1.0 | 0.33760 |          5 |   35 |    72 |       12 |       16 |      14.6 |          0.392 |                7 |
+| 29596471 | 0.099 | 2.4 | 0.01835 |          5 |   50 |   102 |        9 |       40 |      25.7 |          0.518 |               13 |
+| 29796587 | 0.231 | 2.8 | 0.00473 |          5 |   14 |    47 |        9 |       10 |       9.4 |          0.746 |                8 |
+| 30180830 | 0.454 | 5.6 | 0.00000 |          5 |   15 |    63 |       11 |       13 |      12.7 |          0.968 |               13 |
+| 30337868 | 0.574 | 6.0 | 0.00000 |          5 |   11 |    38 |        7 |        9 |       7.7 |          0.897 |                7 |
+| 30368247 | 0.325 | 5.3 | 0.00000 |          5 |   27 |    80 |       14 |       18 |      16.1 |          0.775 |               14 |
+| 30656187 | 0.302 | 4.3 | 0.00002 |          5 |   20 |    42 |        6 |       13 |       9.5 |          0.642 |                6 |
 
 ### Accuracy of LLM-Based Annotations:
 
@@ -542,3 +617,5 @@ writeLines(t3)
 |   Cohen's Kappa)                    |
 +------------------------------------+
 ```
+
+## Summary

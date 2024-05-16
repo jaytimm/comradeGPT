@@ -59,10 +59,10 @@ cmd_process_document <- function(pmid,
                                       "model",
                                       
                                       ## likely won't be necessary as package -- 
-                                      ".complete_chat1",
-                                      ".build_prompt",
-                                      ".openai_chat_completions",
-                                      ".is_valid_json",
+                                      # ".complete_chat1",
+                                      # ".build_prompt",
+                                      # ".openai_chat_completions",
+                                      # ".is_valid_json",
                                       
                                       "process_type",
                                       "variables"),
@@ -91,5 +91,12 @@ cmd_process_document <- function(pmid,
   })
   
   # Combine all data tables into a single data table
-  data.table::rbindlist(processed_list, idcol = 'annotator_id')
+  df <- data.table::rbindlist(processed_list, idcol = 'annotator_id')
+  
+  df[, c('pmid',
+         'annotator_id', 
+         'variable_name', 
+         'variable_type', 
+         'explanation', 
+         'mesh_descriptor')]
 }
