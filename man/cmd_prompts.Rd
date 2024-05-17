@@ -3,9 +3,9 @@
 \docType{data}
 \name{cmd_prompts}
 \alias{cmd_prompts}
-\title{Command Prompts for ResearchTextProcessor Package}
+\title{Command Prompts for comradeGPT}
 \format{
-An object of class \code{list} of length 5.
+An object of class \code{list} of length 7.
 }
 \usage{
 cmd_prompts

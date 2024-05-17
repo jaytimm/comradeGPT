@@ -83,7 +83,7 @@ pmc_fulltext1 <- pmc_fulltext |>
                             auto_unbox = TRUE),
     .groups = 'drop'  )
 
-pp0 <- pmc_fulltext1 |> slice(1:10)
+pp0 <- pmc_fulltext1 |> slice(1:5)
 ```
 
 ``` r
@@ -177,7 +177,7 @@ writeLines(t1)
     ## element. DO NOT include the "```json " code block
     ## notation in the output.
     ## 
-    ## TEXT:
+    ## STUDY:
 
 #### Function/API call
 
@@ -193,9 +193,263 @@ class <- comradeGPT::cmd_process_document(
 class |> head() |> knitr::kable()
 ```
 
-### 2. Table A
+### 2. Summary characteristics
+
+#### Prompt
+
+``` r
+t5 <- strwrap(comradeGPT::cmd_prompts$user_extract_summary, 
+              width = 50)
+writeLines(t5)
+```
+
+    ## Task: Extract and categorize detailed information
+    ## from the medical study presented below.
+    ## 
+    ## Instructions:
+    ## 
+    ## Identify Study Characteristics: Carefully read
+    ## the study to identify key details such as study
+    ## design, population size, covariate definitions,
+    ## major results, effect size, confidence intervals,
+    ## and p-value. Ensure each characteristic is
+    ## considered independently, even if presented in a
+    ## list or grouped with others.
+    ## 
+    ## Use Direct Text Extraction: To ensure precision
+    ## and consistency across multiple annotators,
+    ## extract the language directly from the text. Do
+    ## not paraphrase or interpret beyond what is
+    ## necessary to classify the characteristic.
+    ## 
+    ## Classifications:
+    ## 
+    ## Study Design: Provides a comprehensive
+    ## description of the study's methodology, capturing
+    ## specific design types and other pertinent
+    ## information such as study duration, setting, and
+    ## interventions or exposures assessed.
+    ## 
+    ## Population Size: Contains the total number of
+    ## participants in the study, specifying the number
+    ## of cases and controls, if applicable.
+    ## 
+    ## Covariate Definitions in Maintext: Indicates
+    ## whether the main text of the research article
+    ## mentions covariates used to adjust for
+    ## confounding factors. Annotators mark "Y" if
+    ## covariate details are explicitly stated, "N" if
+    ## not mentioned, and "S" if details are in
+    ## supplementary materials.
+    ## 
+    ## Major Results: Summarizes the primary findings of
+    ## the study in a concise manner.
+    ## 
+    ## Effect Size: Provides the quantitative measure of
+    ## the strength of the association between the
+    ## exposure and the outcome.
+    ## 
+    ## Lower Confidence Interval: Contains the lower
+    ## boundary of the confidence interval for the
+    ## effect size, indicating the range of uncertainty
+    ## surrounding the estimate.
+    ## 
+    ## Upper Confidence Interval: Contains the upper
+    ## boundary of the confidence interval for the
+    ## effect size, indicating the range of uncertainty
+    ## surrounding the estimate.
+    ## 
+    ## P-Value: Contains the p-value of the study
+    ## findings, indicating the likelihood that the
+    ## observed association is not due to chance.
+    ## 
+    ## Output Format: Provide the results as a JSON
+    ## array. Each object in the array should include
+    ## three elements: "field", "value", and
+    ## "explanation".
+    ## 
+    ## Example format:
+    ## 
+    ## [ { "field": "Study Design", "value":
+    ## "cross-sectional study", "explanation": "The
+    ## study description specified it as a
+    ## cross-sectional study."  }, { "field":
+    ## "Population Size", "value": "800 participants,
+    ## with 400 cases and 400 controls", "explanation":
+    ## "The study comprised 800 participants, with 400
+    ## cases and 400 controls."  }, { "field":
+    ## "Covariate Definitions in Maintext", "value":
+    ## "S", "explanation": "The article states that
+    ## covariate details can be found in Supplement A,
+    ## Table C."  }, { "field": "Major Results",
+    ## "value": "Participants with high levels of
+    ## physical activity had a 25% lower risk of
+    ## developing dementia compared to those with low
+    ## activity levels, aOR=0.75.", "explanation": "This
+    ## was the primary finding reported in the results
+    ## section."  }, { "field": "Effect Size", "value":
+    ## "0.75", "explanation": "The odds ratio (OR) for
+    ## developing dementia in the high physical activity
+    ## group was reported as 0.75."  }, { "field":
+    ## "Lower Confidence Interval", "value": "0.60",
+    ## "explanation": "The lower limit of the 95%
+    ## Confidence Interval (CI) for the OR was reported
+    ## as 0.60."  }, { "field": "Upper Confidence
+    ## Interval", "value": "0.90", "explanation": "The
+    ## upper limit of the 95% CI for the OR was reported
+    ## as 0.90."  }, { "field": "P-Value", "value":
+    ## "0.02", "explanation": "The p-value for the
+    ## association between physical activity and
+    ## dementia risk was reported as 0.02."  } ]
+    ## 
+    ## Ensure there is no trailing comma after the last
+    ## element. DO NOT include the "```json " code block
+    ## notation in the output.
+    ## 
+    ## STUDY:
+
+#### Function/API call
+
+``` r
+sumstats <- comradeGPT::cmd_process_document(
+  pmid = pp0$pmid,
+  text = pp0$json,
+  process_type = 'extract_summary',
+  annotators = 5, 
+  cores = 10
+  )
+```
+
+``` r
+sumstats |> head() |> knitr::kable()
+```
+
+| annotator_id | field                             | value                                                                                                                                                                                                                                                                                                         | explanation                                                                                                                                                                                                                                                                                   | pmid     |
+|:--|:----|:-------------------------------|:------------------------------|:-|
+| OSM5611      | Study Design                      | analytical cross-sectional study                                                                                                                                                                                                                                                                              | The research article describes an analytical cross-sectional epidemiological study evaluating the association between vitamin D deficiency and the risk of heart failure in elderly patients of cardiology outpatient clinics.                                                                | 28817241 |
+| OSM5611      | Population Size                   | 137 elderly participants                                                                                                                                                                                                                                                                                      | The study included 137 elderly individuals from the Care Center for the Elderly and outpatient clinic of cardiology at the Hospital das Clínicas, UFPE.                                                                                                                                       | 28817241 |
+| OSM5611      | Covariate Definitions in Maintext | Y                                                                                                                                                                                                                                                                                                             | The main text explicitly mentions covariates used for adjusting in the study, including age, gender, education, ethnicity, hypertension, diabetes mellitus, hypothyroidism, renal failure, dementia, stroke, dyslipidaemia, depression, smoking, alcoholism, obesity, and cardiac arrhythmia. | 28817241 |
+| OSM5611      | Major Results                     | The risk of heart failure was significantly associated with vitamin D deficiency (OR: 12.19; 95% CI = 4.23-35.16; P = 0.000), male gender (OR: 15.32; 95% CI = 3.39-69.20, P = 0.000), obesity (OR: 4.17; 95% CI = 1.36-12.81; P = 0.012), and cardiac arrhythmia (OR: 3.69; 95% CI = 1.23-11.11; P = 0.020). | The primary finding indicates a significant association between vitamin D deficiency and heart failure risk, along with other risk factors identified in the elderly population.                                                                                                              | 28817241 |
+| OSM5611      | Effect Size                       | 12.19 (for vitamin D deficiency), 15.32 (for male gender), 4.17 (for obesity), 3.69 (for cardiac arrhythmia)                                                                                                                                                                                                  | The odds ratios (ORs) for heart failure risk associated with vitamin D deficiency, male gender, obesity, and cardiac arrhythmia are reported in the results section.                                                                                                                          | 28817241 |
+| OSM5611      | Lower Confidence Interval         | 4.23 (for vitamin D deficiency), 3.39 (for male gender), 1.36 (for obesity), 1.23 (for cardiac arrhythmia)                                                                                                                                                                                                    | The lower boundaries of the 95% confidence intervals (CIs) for the odds ratios related to heart failure risk factors are provided in the study results.                                                                                                                                       | 28817241 |
 
 ### 3. Population Characteristics
+
+#### Prompt
+
+``` r
+t4 <- strwrap(comradeGPT::cmd_prompts$user_extract_popchars , 
+              width = 50)
+writeLines(t4)
+```
+
+    ## 
+    ## 
+    ## Task: Extract and categorize all details
+    ## regarding the sample characteristics used in the
+    ## medical study presented below.
+    ## 
+    ## Instructions:
+    ## 
+    ## Identify Sample Characteristics: Carefully read
+    ## the study to identify detailed descriptions of
+    ## the sample characteristics. These can include
+    ## demographic, geographic, temporal, and other
+    ## relevant population characteristics. Ensure each
+    ## characteristic is considered independently, even
+    ## if presented in a list or grouped with others.
+    ## 
+    ## Use Direct Text Extraction: To ensure precision
+    ## and consistency across multiple annotators,
+    ## extract the language directly from the text. Do
+    ## not paraphrase or interpret beyond what is
+    ## necessary to classify the characteristic.
+    ## 
+    ## Classifications:
+    ## 
+    ## Demographic Information: Information related to
+    ## the population's age, gender, ethnicity,
+    ## socioeconomic status, and educational background.
+    ## Geographic Characteristics: Details on the
+    ## specific regions, urban vs. rural settings, and
+    ## relevant climate or environmental conditions
+    ## where the study was conducted. Health-Related
+    ## Factors: Prevalence of certain medical
+    ## conditions, behavioral aspects, and access to
+    ## healthcare services. Sampling Method Details:
+    ## Type of sampling, inclusion and exclusion
+    ## criteria, sample size, and how it was determined.
+    ## Temporal Aspects: Timeframe and periodicity of
+    ## data collection. Other Relevant Characteristics:
+    ## Occupational data, lifestyle factors, and
+    ## psychosocial factors. List each characteristic
+    ## individually: Avoid grouping variables under
+    ## broad categories. Specify each factor clearly and
+    ## separately.
+    ## 
+    ## Output Format: Provide the results as a JSON
+    ## array. Each object in the array should include
+    ## four elements: "characteristic_name",
+    ## "characteristic_type", "explanation", and
+    ## "value".
+    ## 
+    ## Example format:
+    ## 
+    ## [ { "characteristic_name": "Age range",
+    ## "characteristic_type": "Demographic Information",
+    ## "explanation": "The range of ages of the
+    ## participants in the study.", "value": "18-65" },
+    ## { "characteristic_name": "Gender distribution",
+    ## "characteristic_type": "Demographic Information",
+    ## "explanation": "The proportion of male and female
+    ## participants in the study.", "value": "50%
+    ## female, 50% male" }, { "characteristic_name":
+    ## "Ethnicity", "characteristic_type": "Demographic
+    ## Information", "explanation": "The racial or
+    ## ethnic background of the participants.", "value":
+    ## "40% Caucasian, 30% Hispanic, 20% African
+    ## American, 10% Asian" }, { "characteristic_name":
+    ## "Specific regions", "characteristic_type":
+    ## "Geographic Characteristics", "explanation": "The
+    ## regions or countries where the study was
+    ## conducted.", "value": "Urban areas in the
+    ## Northeastern United States" }, {
+    ## "characteristic_name": "Prevalence of medical
+    ## conditions", "characteristic_type":
+    ## "Health-Related Factors", "explanation": "The
+    ## percentage of participants with certain medical
+    ## conditions.", "value": "15% with diabetes" } ]
+    ## 
+    ## Ensure there is no trailing comma after the last
+    ## element. DO NOT include the "```json " code block
+    ## notation in the output.
+    ## 
+    ## STUDY:
+
+#### Function/API call
+
+``` r
+popchars <- comradeGPT::cmd_process_document(
+  pmid = pp0$pmid,
+  text = pp0$json,
+  process_type = 'extract_popchars',
+  annotators = 5, 
+  cores = 10
+  )
+```
+
+``` r
+popchars |> head() |> knitr::kable()
+```
+
+| annotator_id | characteristic_name       | characteristic_type     | explanation                                                             | value                                                                                           | pmid     |
+|:----|:--------|:-------|:--------------------|:---------------------------|:---|
+| OSM5611      | Age classes               | Demographic Information | The distribution of age groups among the elderly participants.          | 60–69 (46.6%), 70–79 (43.8%), 80+ (9.5%)                                                        | 28817241 |
+| OSM5611      | Sex                       | Demographic Information | The proportion of male and female participants in the study.            | Male: 24.1%, Female: 75.9%                                                                      | 28817241 |
+| OSM5611      | Self-referred skin colour | Demographic Information | The distribution of participants based on self-reported skin colour.    | White: 36.5%, Mixed colour: 50.4%, Black: 13.1%                                                 | 28817241 |
+| OSM5611      | Marital status            | Demographic Information | The marital status of the elderly participants.                         | Single: 7.3%, Married or stable union: 62.0%, Widow/er: 27.0%, Divorced or separated: 3.6%      | 28817241 |
+| OSM5611      | Education of the elder    | Demographic Information | The educational background of the elderly participants.                 | Illiterate: 18.0%, Basic I: 28.5%, Basic II: 29.9%, High school: 21.9%, Higher education: 11.7% | 28817241 |
+| OSM5611      | Economic class, Brazil    | Demographic Information | The distribution of economic classes based on Brazilian classification. | A: 21.5%, B1: 21.5%, B2: 10.2%, C1: 24.8%, C2: 14.5%, D and E: 17.5%                            | 28817241 |
 
 ### 4. Variable extraction
 
@@ -303,23 +557,22 @@ variables <- comradeGPT::cmd_process_document(
   annotators = 5, 
   cores = 10
   )
+```
 
+``` r
 variables |> head() |> knitr::kable()
 ```
 
-| pmid     | annotator_id | variable_name        | variable_type | explanation                                                                  | mesh_descriptor      |
-|:----|:------|:---------|:------|:---------------------------------|:---------|
-| 28817241 | OMO5232      | Heart Failure        | OUTCOME       | Main outcome variable in the study related to heart failure risk assessment. | Heart Failure        |
-| 28817241 | OMO5232      | Vitamin D deficiency | EXPOSURE      | Independent variable related to the risk of heart failure.                   | Vitamin D Deficiency |
-| 28817241 | OMO5232      | Age                  | COVARIATE     | Covariate considering the age of the elderly participants.                   | Age                  |
-| 28817241 | OMO5232      | Gender               | COVARIATE     | Covariate representing the gender of the elderly participants.               | Gender               |
-| 28817241 | OMO5232      | Education            | COVARIATE     | Covariate indicating the educational level of the elderly participants.      | Education            |
-| 28817241 | OMO5232      | Ethnicity            | COVARIATE     | Covariate describing the ethnic background of the elderly participants.      | Ethnic Groups        |
+| annotator_id | variable_name        | variable_type | explanation                                                      | mesh_descriptor      | pmid     |
+|:------|:----------|:-------|:------------------------------|:----------|:-----|
+| OSM5611      | Heart Failure        | OUTCOME       | Main health condition being predicted or explained in the study. | Heart Failure        | 28817241 |
+| OSM5611      | Vitamin D deficiency | EXPOSURE      | Factor analyzed for its potential effect on heart failure risk.  | Vitamin D Deficiency | 28817241 |
+| OSM5611      | Age                  | COVARIATE     | Baseline characteristic controlled for in the analyses.          | Age                  | 28817241 |
+| OSM5611      | Gender               | COVARIATE     | Demographic characteristic controlled for in the analyses.       | Gender               | 28817241 |
+| OSM5611      | Education            | COVARIATE     | Baseline characteristic controlled for in the analyses.          | Education            | 28817241 |
+| OSM5611      | Ethnicity            | COVARIATE     | Baseline characteristic controlled for in the analyses.          | Ethnic Groups        | 28817241 |
 
 ### 5. Variable attribute extraction
-
-> NOTE – this will be more challenging than initially thought –
-> specifically WRT aligning PMIDs in variable list with PMIDs in text –
 
 ``` r
 sample_characteristics <- list(
@@ -490,6 +743,8 @@ writeLines(t3)
     ## element. DO NOT include the "```json " code block
     ## notation in the output.
 
+#### API call
+
 ## Evaluation Framework
 
 > this is very specific to variables at present – needs to be made
@@ -505,18 +760,20 @@ writeLines(t3)
     annotators.
 
 ``` r
-precision <- variables |> comradeGPT::cmd_calc_precision(cols = c('variable_name', 'variable_type'))
+precision <- variables |> 
+  comradeGPT::cmd_calc_precision(cols = c('variable_name', 
+                                          'variable_type'))
 precision |> head() |> knitr::kable()
 ```
 
 | pmid     | variable_name        | variable_type | annotators | var_freq | agree_rate |
 |:--------|:-------------------|:-------------|----------:|--------:|----------:|
-| 28817241 | HEART FAILURE        | OUTCOME       |          5 |        5 |          1 |
-| 28817241 | VITAMIN D DEFICIENCY | EXPOSURE      |          5 |        5 |          1 |
-| 28817241 | AGE                  | COVARIATE     |          5 |        5 |          1 |
-| 28817241 | GENDER               | COVARIATE     |          5 |        5 |          1 |
-| 28817241 | EDUCATION            | COVARIATE     |          5 |        5 |          1 |
-| 28817241 | ETHNICITY            | COVARIATE     |          5 |        5 |          1 |
+| 28817241 | HEART FAILURE        | OUTCOME       |          5 |        3 |        0.6 |
+| 28817241 | VITAMIN D DEFICIENCY | EXPOSURE      |          5 |        5 |        1.0 |
+| 28817241 | AGE                  | COVARIATE     |          5 |        5 |        1.0 |
+| 28817241 | GENDER               | COVARIATE     |          5 |        5 |        1.0 |
+| 28817241 | EDUCATION            | COVARIATE     |          5 |        5 |        1.0 |
+| 28817241 | ETHNICITY            | COVARIATE     |          5 |        5 |        1.0 |
 
 ### Consensus Variables:
 
@@ -545,22 +802,18 @@ precision |> head() |> knitr::kable()
 ``` r
 # 30180830
 agreement <- variables |> 
-  comradeGPT::cmd_calc_agreement(cols = c('variable_name', 'variable_type'))
+  comradeGPT::cmd_calc_agreement(cols = c('variable_name', 
+                                          'variable_type'))
 agreement |> knitr::kable()
 ```
 
 | pmid     | kappa |   z | p_value | annotators | type | token | min_vars | max_vars | mean_vars | rate_consensus | n_consensus_vars |
 |:-----|----:|---:|-----:|------:|---:|----:|-----:|-----:|------:|---------:|----------:|
-| 28817241 | 0.579 | 8.2 | 0.00000 |          5 |   20 |    95 |       19 |       19 |      19.0 |          0.990 |               19 |
-| 29276677 | 0.101 | 1.8 | 0.07174 |          5 |   30 |    57 |        8 |       14 |      11.9 |          0.491 |                7 |
-| 29330643 | 0.237 | 3.9 | 0.00010 |          5 |   26 |    79 |        9 |       18 |      16.5 |          0.835 |               16 |
-| 29574441 | 0.047 | 1.0 | 0.33760 |          5 |   35 |    72 |       12 |       16 |      14.6 |          0.392 |                7 |
-| 29596471 | 0.099 | 2.4 | 0.01835 |          5 |   50 |   102 |        9 |       40 |      25.7 |          0.518 |               13 |
-| 29796587 | 0.231 | 2.8 | 0.00473 |          5 |   14 |    47 |        9 |       10 |       9.4 |          0.746 |                8 |
-| 30180830 | 0.454 | 5.6 | 0.00000 |          5 |   15 |    63 |       11 |       13 |      12.7 |          0.968 |               13 |
-| 30337868 | 0.574 | 6.0 | 0.00000 |          5 |   11 |    38 |        7 |        9 |       7.7 |          0.897 |                7 |
-| 30368247 | 0.325 | 5.3 | 0.00000 |          5 |   27 |    80 |       14 |       18 |      16.1 |          0.775 |               14 |
-| 30656187 | 0.302 | 4.3 | 0.00002 |          5 |   20 |    42 |        6 |       13 |       9.5 |          0.642 |                6 |
+| 28817241 | 0.441 | 6.4 | 0.00000 |          5 |   21 |    94 |       18 |       19 |      18.8 |          0.966 |               19 |
+| 29276677 | 0.067 | 1.0 | 0.32172 |          5 |   20 |    41 |        5 |       10 |       8.6 |          0.462 |                5 |
+| 29330643 | 0.101 | 2.1 | 0.04005 |          5 |   40 |    87 |        8 |       25 |      19.9 |          0.689 |               17 |
+| 29574441 | 0.039 | 0.7 | 0.46250 |          5 |   27 |    64 |        8 |       15 |      13.3 |          0.299 |                4 |
+| 29596471 | 0.056 | 1.1 | 0.27493 |          5 |   31 |    82 |       11 |       21 |      17.4 |          0.647 |               15 |
 
 ### Accuracy of LLM-Based Annotations:
 

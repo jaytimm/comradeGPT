@@ -1,6 +1,6 @@
 # cmd_prompts.R
 
-#' Command Prompts for ResearchTextProcessor Package
+#' Command Prompts for comradeGPT
 #'
 #' This list contains descriptions of various tasks related to processing and classifying scientific texts,
 #' extracting key variables, and generating structured outputs for epidemiological and clinical research data.
@@ -16,7 +16,7 @@ cmd_prompts = list(
 system_classify_text = 'You are an expert scientist skilled in analyzing observational, human-based studies. You excel at identifying whether research involves human subjects, uses non-interventional methods, and sources data from real-world settings. Your ability to quickly categorize and interpret complex academic texts makes you a valuable resource for researchers.',
 
 
-system_extract_variables = "You are an epidemiologist creating a database for chronic disease research. This tool will catalog definitions of risk factors, treatments, outcomes, and covariates from studies. It will help researchers identify essential variables for data collection and offer methods for accurately annotating these variables in texts. Additionally, the database supports benchmarking causal feature selection methods that utilize structured knowledge.",
+system_extract_variables = "As an expert epidemiologist, your primary responsibility is to identify and extract detailed information from chronic disease research studies. This includes not only definitions of risk factors, treatments, outcomes, and covariates, but also population characteristics, study overviews, study characteristics, and variable attributes. Utilizing your expertise in epidemiology and data annotation, you will ensure the precise extraction and accurate classification of these elements. Your skills in structured knowledge and causal feature selection methods will support researchers in identifying essential variables for data collection and ensuring the reliability of the annotated data for further research.",
 
 
 user_extract_variables = 'Task: Extract all EXPOSURE, OUTCOME, and COVARIATE variables included in the medical study presented below.
@@ -185,9 +185,153 @@ Provide the results as a JSON array. Expected format is detailed below:
 Ensure there is no trailing comma after the last element.
 DO NOT include the "```json " code block notation in the output.
 
-TEXT: '
+STUDY: ',
+
+user_extract_popchars = '
+
+Task: Extract and categorize all details regarding the sample characteristics used in the medical study presented below.
+
+Instructions:
+
+Identify Sample Characteristics: Carefully read the study to identify detailed descriptions of the sample characteristics. These can include demographic, geographic, temporal, and other relevant population characteristics. Ensure each characteristic is considered independently, even if presented in a list or grouped with others.
+
+Use Direct Text Extraction: To ensure precision and consistency across multiple annotators, extract the language directly from the text. Do not paraphrase or interpret beyond what is necessary to classify the characteristic.
+
+Classifications:
+
+Demographic Information: Information related to the population\'s age, gender, ethnicity, socioeconomic status, and educational background.
+Geographic Characteristics: Details on the specific regions, urban vs. rural settings, and relevant climate or environmental conditions where the study was conducted.
+Health-Related Factors: Prevalence of certain medical conditions, behavioral aspects, and access to healthcare services.
+Sampling Method Details: Type of sampling, inclusion and exclusion criteria, sample size, and how it was determined.
+Temporal Aspects: Timeframe and periodicity of data collection.
+Other Relevant Characteristics: Occupational data, lifestyle factors, and psychosocial factors.
+List each characteristic individually: Avoid grouping variables under broad categories. Specify each factor clearly and separately.
+
+Output Format:
+  Provide the results as a JSON array. Each object in the array should include four elements: "characteristic_name", "characteristic_type", "explanation", and "value".
+
+Example format:
+
+[
+  {
+    "characteristic_name": "Age range",
+    "characteristic_type": "Demographic Information",
+    "explanation": "The range of ages of the participants in the study.",
+    "value": "18-65"
+  },
+  {
+    "characteristic_name": "Gender distribution",
+    "characteristic_type": "Demographic Information",
+    "explanation": "The proportion of male and female participants in the study.",
+    "value": "50% female, 50% male"
+  },
+  {
+    "characteristic_name": "Ethnicity",
+    "characteristic_type": "Demographic Information",
+    "explanation": "The racial or ethnic background of the participants.",
+    "value": "40% Caucasian, 30% Hispanic, 20% African American, 10% Asian"
+  },
+  {
+    "characteristic_name": "Specific regions",
+    "characteristic_type": "Geographic Characteristics",
+    "explanation": "The regions or countries where the study was conducted.",
+    "value": "Urban areas in the Northeastern United States"
+  },
+  {
+    "characteristic_name": "Prevalence of medical conditions",
+    "characteristic_type": "Health-Related Factors",
+    "explanation": "The percentage of participants with certain medical conditions.",
+    "value": "15% with diabetes"
+  }
+]
+
+Ensure there is no trailing comma after the last element.
+DO NOT include the "```json " code block notation in the output.
+
+STUDY:
+',
 
 
 
+
+user_extract_summary = '
+Task: Extract and categorize detailed information from the medical study presented below.
+
+Instructions:
+
+Identify Study Characteristics: Carefully read the study to identify key details such as study design, population size, covariate definitions, major results, effect size, confidence intervals, and p-value. Ensure each characteristic is considered independently, even if presented in a list or grouped with others.
+
+Use Direct Text Extraction: To ensure precision and consistency across multiple annotators, extract the language directly from the text. Do not paraphrase or interpret beyond what is necessary to classify the characteristic.
+
+Classifications:
+
+Study Design: Provides a comprehensive description of the study\'s methodology, capturing specific design types and other pertinent information such as study duration, setting, and interventions or exposures assessed.
+
+Population Size: Contains the total number of participants in the study, specifying the number of cases and controls, if applicable.
+
+Covariate Definitions in Maintext: Indicates whether the main text of the research article mentions covariates used to adjust for confounding factors. Annotators mark "Y" if covariate details are explicitly stated, "N" if not mentioned, and "S" if details are in supplementary materials.
+
+Major Results: Summarizes the primary findings of the study in a concise manner.
+
+Effect Size: Provides the quantitative measure of the strength of the association between the exposure and the outcome.
+
+Lower Confidence Interval: Contains the lower boundary of the confidence interval for the effect size, indicating the range of uncertainty surrounding the estimate.
+
+Upper Confidence Interval: Contains the upper boundary of the confidence interval for the effect size, indicating the range of uncertainty surrounding the estimate.
+
+P-Value: Contains the p-value of the study findings, indicating the likelihood that the observed association is not due to chance.
+
+Output Format:
+  Provide the results as a JSON array. Each object in the array should include three elements: "field", "value", and "explanation".
+
+Example format:
+
+  [
+    {
+      "field": "Study Design",
+      "value": "cross-sectional study",
+      "explanation": "The study description specified it as a cross-sectional study."
+    },
+    {
+      "field": "Population Size",
+      "value": "800 participants, with 400 cases and 400 controls",
+      "explanation": "The study comprised 800 participants, with 400 cases and 400 controls."
+    },
+    {
+      "field": "Covariate Definitions in Maintext",
+      "value": "S",
+      "explanation": "The article states that covariate details can be found in Supplement A, Table C."
+    },
+    {
+      "field": "Major Results",
+      "value": "Participants with high levels of physical activity had a 25% lower risk of developing dementia compared to those with low activity levels, aOR=0.75.",
+      "explanation": "This was the primary finding reported in the results section."
+    },
+    {
+      "field": "Effect Size",
+      "value": "0.75",
+      "explanation": "The odds ratio (OR) for developing dementia in the high physical activity group was reported as 0.75."
+    },
+    {
+      "field": "Lower Confidence Interval",
+      "value": "0.60",
+      "explanation": "The lower limit of the 95% Confidence Interval (CI) for the OR was reported as 0.60."
+    },
+    {
+      "field": "Upper Confidence Interval",
+      "value": "0.90",
+      "explanation": "The upper limit of the 95% CI for the OR was reported as 0.90."
+    },
+    {
+      "field": "P-Value",
+      "value": "0.02",
+      "explanation": "The p-value for the association between physical activity and dementia risk was reported as 0.02."
+    }
+  ]
+
+Ensure there is no trailing comma after the last element. DO NOT include the "```json " code block notation in the output.
+
+STUDY:
+'
 
 )

@@ -138,6 +138,11 @@
            system_message = if (!is.null(system_message)) system_message else comradeGPT::cmd_prompts$system_classify_text
          ),
          
+         extract_summary = list(
+           user_message = paste(comradeGPT::cmd_prompts$user_extract_summary, text, sep = '\n\n'),
+           system_message = if (!is.null(system_message)) system_message else comradeGPT::cmd_prompts$system_extract_variables
+         ),
+         
          extract_variables = list(
            user_message = paste(comradeGPT::cmd_prompts$user_extract_variables, text, sep = '\n\n'),
            system_message = if (!is.null(system_message)) system_message else comradeGPT::cmd_prompts$system_extract_variables
@@ -151,10 +156,10 @@
            system_message = if (!is.null(system_message)) system_message else comradeGPT::cmd_prompts$system_extract_variables
          ),
          
-         # extract_popchars = list(
-         #   user_message = paste(comradeGPT::cmd_prompts$user_extract_popchars, text, sep = '\n\n'),
-         #   system_message = if (!is.null(system_message)) system_message else comradeGPT::cmd_prompts$system_extract_variables
-         # ),
+         extract_popchars = list(
+           user_message = paste(comradeGPT::cmd_prompts$user_extract_popchars, text, sep = '\n\n'),
+           system_message = if (!is.null(system_message)) system_message else comradeGPT::cmd_prompts$system_extract_variables
+         ),
          
          manual = list(
            user_message = paste(user_message, text, sep = '\n\n'),

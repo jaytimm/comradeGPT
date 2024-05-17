@@ -25,6 +25,7 @@ cmd_process_document <- function(pmid,
                                  
                                  process_type = c('classify_texts',
                                                   
+                                                  'extract_summary',
                                                   'extract_variables',
                                                   'extract_attributes',
                                                   'extract_popchars',
@@ -93,10 +94,12 @@ cmd_process_document <- function(pmid,
   # Combine all data tables into a single data table
   df <- data.table::rbindlist(processed_list, idcol = 'annotator_id')
   
-  df[, c('pmid',
-         'annotator_id', 
-         'variable_name', 
-         'variable_type', 
-         'explanation', 
-         'mesh_descriptor')]
+  # df[, c('pmid',
+  #        'annotator_id', 
+  #        'variable_name', 
+  #        'variable_type', 
+  #        'explanation', 
+  #        'mesh_descriptor')]
+  
+  return(df)
 }
