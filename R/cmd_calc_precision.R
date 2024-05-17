@@ -48,7 +48,7 @@ cmd_calc_precision <- function(x, cols) {
   agg_data <- variables[, .(var_freq = .N), by = c("pmid", cols, "annotators")]
   
   # Calculate the agreement rate
-  agg_data[, agree_rate := var_freq / annotators]
+  agg_data[, precision := var_freq / annotators]
   
   return(agg_data)
 }

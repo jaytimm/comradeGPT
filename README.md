@@ -115,11 +115,13 @@ substr(pmc_fulltext1$json[2], 1, 3000) |> cat()
 
 ``` r
 process_type = c('classify_texts',
+                 
+                 'extract_summry',
                  'extract_variables',
                  'extract_attributes',
                  'extract_popchars',
+                 
                  'manual'
-                 ## Table A
                  ) 
 ```
 
@@ -324,14 +326,14 @@ sumstats <- comradeGPT::cmd_process_document(
 sumstats |> head() |> knitr::kable()
 ```
 
-| annotator_id | field                             | value                                                                                                                                                                                                                                                                                                         | explanation                                                                                                                                                                                                                                                                                   | pmid     |
-|:--|:----|:-------------------------------|:------------------------------|:-|
-| OSM5611      | Study Design                      | analytical cross-sectional study                                                                                                                                                                                                                                                                              | The research article describes an analytical cross-sectional epidemiological study evaluating the association between vitamin D deficiency and the risk of heart failure in elderly patients of cardiology outpatient clinics.                                                                | 28817241 |
-| OSM5611      | Population Size                   | 137 elderly participants                                                                                                                                                                                                                                                                                      | The study included 137 elderly individuals from the Care Center for the Elderly and outpatient clinic of cardiology at the Hospital das Clínicas, UFPE.                                                                                                                                       | 28817241 |
-| OSM5611      | Covariate Definitions in Maintext | Y                                                                                                                                                                                                                                                                                                             | The main text explicitly mentions covariates used for adjusting in the study, including age, gender, education, ethnicity, hypertension, diabetes mellitus, hypothyroidism, renal failure, dementia, stroke, dyslipidaemia, depression, smoking, alcoholism, obesity, and cardiac arrhythmia. | 28817241 |
-| OSM5611      | Major Results                     | The risk of heart failure was significantly associated with vitamin D deficiency (OR: 12.19; 95% CI = 4.23-35.16; P = 0.000), male gender (OR: 15.32; 95% CI = 3.39-69.20, P = 0.000), obesity (OR: 4.17; 95% CI = 1.36-12.81; P = 0.012), and cardiac arrhythmia (OR: 3.69; 95% CI = 1.23-11.11; P = 0.020). | The primary finding indicates a significant association between vitamin D deficiency and heart failure risk, along with other risk factors identified in the elderly population.                                                                                                              | 28817241 |
-| OSM5611      | Effect Size                       | 12.19 (for vitamin D deficiency), 15.32 (for male gender), 4.17 (for obesity), 3.69 (for cardiac arrhythmia)                                                                                                                                                                                                  | The odds ratios (ORs) for heart failure risk associated with vitamin D deficiency, male gender, obesity, and cardiac arrhythmia are reported in the results section.                                                                                                                          | 28817241 |
-| OSM5611      | Lower Confidence Interval         | 4.23 (for vitamin D deficiency), 3.39 (for male gender), 1.36 (for obesity), 1.23 (for cardiac arrhythmia)                                                                                                                                                                                                    | The lower boundaries of the 95% confidence intervals (CIs) for the odds ratios related to heart failure risk factors are provided in the study results.                                                                                                                                       | 28817241 |
+| annotator_id | field                             | value                                                                                                                                                                                                                                                                                                 | explanation                                                                                                                                                                                      | pmid     |
+|:--|:-----|:------------------------------------|:------------------------|:--|
+| OSM5611      | Study Design                      | analytical cross-sectional study                                                                                                                                                                                                                                                                      | The study design was analytical and cross-sectional, conducted in the Care Center for the Elderly and outpatient clinic of cardiology of the Hospital das Clínicas, UFPE.                        | 28817241 |
+| OSM5611      | Population Size                   | 137 elderly participants                                                                                                                                                                                                                                                                              | The study included 137 elderly participants as indicated in the Methods section.                                                                                                                 | 28817241 |
+| OSM5611      | Covariate Definitions in Maintext | N                                                                                                                                                                                                                                                                                                     | The main text does not explicitly mention covariate definitions.                                                                                                                                 | 28817241 |
+| OSM5611      | Major Results                     | Risk of heart failure significantly associated with vitamin D deficiency (OR: 12.19; 95% CI = 4.23-35.16; P = 0.000), male gender (OR: 15.32; 95% CI = 3.39-69.20, P = 0.000), obesity (OR: 4.17; 95% CI = 1.36-12.81; P = 0.012), and cardiac arrhythmia (OR: 3.69; 95% CI = 1.23-11.11; P = 0.020). | The primary finding indicates the significant associations found between risk of heart failure and various factors including vitamin D deficiency, male gender, obesity, and cardiac arrhythmia. | 28817241 |
+| OSM5611      | Effect Size                       | 12.19 (vitamin D deficiency), 15.32 (male gender), 4.17 (obesity), 3.69 (cardiac arrhythmia)                                                                                                                                                                                                          | The odds ratios (OR) indicate the strength of association between the risk factors and heart failure risk.                                                                                       | 28817241 |
+| OSM5611      | Lower Confidence Interval         | 4.23 (vitamin D deficiency), 3.39 (male gender), 1.36 (obesity), 1.23 (cardiac arrhythmia)                                                                                                                                                                                                            | These lower bounds represent the lower limit of the 95% confidence interval for the respective odds ratios.                                                                                      | 28817241 |
 
 ### 3. Population Characteristics
 
@@ -442,14 +444,14 @@ popchars <- comradeGPT::cmd_process_document(
 popchars |> head() |> knitr::kable()
 ```
 
-| annotator_id | characteristic_name       | characteristic_type     | explanation                                                             | value                                                                                           | pmid     |
-|:----|:--------|:-------|:--------------------|:---------------------------|:---|
-| OSM5611      | Age classes               | Demographic Information | The distribution of age groups among the elderly participants.          | 60–69 (46.6%), 70–79 (43.8%), 80+ (9.5%)                                                        | 28817241 |
-| OSM5611      | Sex                       | Demographic Information | The proportion of male and female participants in the study.            | Male: 24.1%, Female: 75.9%                                                                      | 28817241 |
-| OSM5611      | Self-referred skin colour | Demographic Information | The distribution of participants based on self-reported skin colour.    | White: 36.5%, Mixed colour: 50.4%, Black: 13.1%                                                 | 28817241 |
-| OSM5611      | Marital status            | Demographic Information | The marital status of the elderly participants.                         | Single: 7.3%, Married or stable union: 62.0%, Widow/er: 27.0%, Divorced or separated: 3.6%      | 28817241 |
-| OSM5611      | Education of the elder    | Demographic Information | The educational background of the elderly participants.                 | Illiterate: 18.0%, Basic I: 28.5%, Basic II: 29.9%, High school: 21.9%, Higher education: 11.7% | 28817241 |
-| OSM5611      | Economic class, Brazil    | Demographic Information | The distribution of economic classes based on Brazilian classification. | A: 21.5%, B1: 21.5%, B2: 10.2%, C1: 24.8%, C2: 14.5%, D and E: 17.5%                            | 28817241 |
+| annotator_id | characteristic_name       | characteristic_type     | explanation                                                                 | value                                                                                          | pmid     |
+|:----|:-------|:-------|:---------------------|:--------------------------|:---|
+| OSM5611      | Age classes (years)       | Demographic Information | The distribution of age groups among the elderly participants.              | 60-69 (46.6%), 70-79 (43.8%), 80+ (9.5%)                                                       | 28817241 |
+| OSM5611      | Sex                       | Demographic Information | The distribution of male and female participants.                           | Male: 24.1%, Female: 75.9%                                                                     | 28817241 |
+| OSM5611      | Self-referred skin colour | Demographic Information | The distribution of skin color among the elderly participants.              | White: 36.5%, Mixed color: 50.4%, Black: 13.1%                                                 | 28817241 |
+| OSM5611      | Marital status            | Demographic Information | The marital status distribution of the elderly participants.                | Single: 7.3%, Married or stable union: 62.0%, Widow/er: 27.0%, Divorced or separated: 3.6%     | 28817241 |
+| OSM5611      | Education of the elder    | Demographic Information | The educational background of the elderly participants.                     | Illiterate: 8.0%, Basic I: 28.5%, Basic II: 29.9%, High school: 21.9%, Higher education: 11.7% | 28817241 |
+| OSM5611      | Economic class, Brazil    | Demographic Information | The distribution of economic classes of the elderly participants in Brazil. | A: 21.5%, B1: 21.5%, B2: 10.2%, C1: 24.8%, C2: 14.5%, D and E: 17.5%                           | 28817241 |
 
 ### 4. Variable extraction
 
@@ -555,7 +557,7 @@ variables <- comradeGPT::cmd_process_document(
   text = pp0$json,
   process_type = 'extract_variables',
   annotators = 5, 
-  cores = 10
+  cores = 3
   )
 ```
 
@@ -563,66 +565,66 @@ variables <- comradeGPT::cmd_process_document(
 variables |> head() |> knitr::kable()
 ```
 
-| annotator_id | variable_name        | variable_type | explanation                                                      | mesh_descriptor      | pmid     |
-|:------|:----------|:-------|:------------------------------|:----------|:-----|
-| OSM5611      | Heart Failure        | OUTCOME       | Main health condition being predicted or explained in the study. | Heart Failure        | 28817241 |
-| OSM5611      | Vitamin D deficiency | EXPOSURE      | Factor analyzed for its potential effect on heart failure risk.  | Vitamin D Deficiency | 28817241 |
-| OSM5611      | Age                  | COVARIATE     | Baseline characteristic controlled for in the analyses.          | Age                  | 28817241 |
-| OSM5611      | Gender               | COVARIATE     | Demographic characteristic controlled for in the analyses.       | Gender               | 28817241 |
-| OSM5611      | Education            | COVARIATE     | Baseline characteristic controlled for in the analyses.          | Education            | 28817241 |
-| OSM5611      | Ethnicity            | COVARIATE     | Baseline characteristic controlled for in the analyses.          | Ethnic Groups        | 28817241 |
+| annotator_id | variable_name         | variable_type | explanation                                              | mesh_descriptor      | pmid     |
+|:-------|:-----------|:-------|:----------------------------|:-----------|:-----|
+| OSM5611      | Risk of Heart Failure | OUTCOME       | Main effect being predicted in the study.                | Heart Failure        | 28817241 |
+| OSM5611      | Vitamin D Deficiency  | EXPOSURE      | Factor analyzed for association with heart failure risk. | Vitamin D Deficiency | 28817241 |
+| OSM5611      | Age                   | COVARIATE     | Demographic factor controlled for in the analysis.       | Age                  | 28817241 |
+| OSM5611      | Gender                | COVARIATE     | Demographic factor controlled for in the analysis.       | Gender               | 28817241 |
+| OSM5611      | Education             | COVARIATE     | Demographic factor controlled for in the analysis.       | Education            | 28817241 |
+| OSM5611      | Ethnicity             | COVARIATE     | Demographic factor controlled for in the analysis.       | Ethnicity            | 28817241 |
 
 ### 5. Variable attribute extraction
 
+> Requires “consensus annotation” for `variable set` included in study.
+> So, this workflow a bit different than others at present.
+
 ``` r
-sample_characteristics <- list(
-  Biology_Genetics = list(
-    "Biology/Genetics"
-  ),
-  Family_Planning = list(
-    "1st trimester care",
-    "Use of ART"
-  ),
-  Health_Behaviors = list(
-    "Drinking",
-    "Smoking",
-    "Substance use"
-  ),
-  Implicit_Racial_Bias = list(
-    "Structural racism"
-  ),
-  Reproductive_Hx = list(
-    "Hx of abortion",
-    "Hx of pregnancy loss",
-    "Hx of perinatal death",
-    "Hx of preterm birth",
-    "Parity/Gravidity",
-    "Previous C-section",
-    "Previous birth weight",
-    "Prior pregnancy outcome"
-  ),
-  Sociodemographics = list(
-    "Geographic area",
-    "Maternal age",
-    "Marital status",
-    "Race/ethnicity",
-    "Paternity"
-  ),
-  Socioeconomics = list(
-    "Education",
-    "Insurance",
-    "Income assistance",
-    "SES category"
-  ),
-  Underlying_Health = list(
-    "Chronic diseases",
-    "Diabetes",
-    "Hypertension",
-    "Maternal weight",
-    "Maternal BMI"
-  )
-)
+# The function filters variables with precision >= 0.6 and ensures at least one variable per variable type (EXPOSURE, OUTCOME, COVARIATE) for each PMID, even if it doesn't meet the precision threshold, by prioritizing the highest precision score within each type.
+
+get_consensus <- function(data) {
+  # Filter variables with precision >= 0.6
+  consensus_variables <- data[data$precision >= 0.6, ]
+  
+  # Ensure at least one variable per type with the highest precision score is included
+  min_vars_per_type <- do.call(rbind, lapply(split(data, list(data$variable_type, data$pmid)), function(subdata) {
+    subdata[subdata$precision == max(subdata$precision), ][1, , drop = FALSE]  # Take the first occurrence in case of ties
+  }))
+  
+  # Combine both filtered and minimum required variables
+  combined_variables <- rbind(consensus_variables, min_vars_per_type)
+  
+  # Remove duplicates, keeping the highest precision entries
+  final_variables <- combined_variables[order(combined_variables$precision, decreasing = TRUE), ]
+  final_variables <- final_variables[!duplicated(final_variables[, c("variable_name", "variable_type", "pmid")]), ]
+  
+  return(final_variables)
+}
 ```
+
+``` r
+consensus_variables <- variables |> 
+  comradeGPT::cmd_calc_precision(cols = c('variable_name', 
+                                          'variable_type')) |>
+  
+  get_consensus() 
+```
+
+``` r
+consensus_variables |>
+  count(pmid, variable_type) |>
+  tidyr::pivot_wider(names_from = variable_type,
+                     values_from = n) |>
+  knitr::kable()
+```
+
+| pmid     | COVARIATE | EXPOSURE | OUTCOME |
+|:---------|----------:|---------:|--------:|
+| 28817241 |        17 |        1 |       1 |
+| 29276677 |         6 |        1 |       1 |
+| 29330643 |        15 |        1 |       1 |
+| 29574441 |         6 |        3 |       1 |
+| 29596471 |         1 |        4 |       1 |
 
 #### Prompt
 
@@ -745,10 +747,74 @@ writeLines(t3)
 
 #### API call
 
-## Evaluation Framework
+``` r
+cvs_json <- consensus_variables |>
+  group_by(pmid) |>
+  summarize(
+    json_vars = jsonlite::toJSON(list(data.frame(variable_name, variable_type)), 
+                            pretty = TRUE, 
+                            auto_unbox = TRUE),
+    .groups = 'drop'  )
 
-> this is very specific to variables at present – needs to be made
-> generic to all task types –
+pp1 <- pp0 |> left_join(cvs_json)
+```
+
+    ## Joining with `by = join_by(pmid)`
+
+``` r
+attributes <- comradeGPT::cmd_process_document(
+  pmid = pp1$pmid,
+  text = pp1$json,
+  
+  variables = pp1$json_vars,
+  
+  process_type = 'extract_attributes',
+  annotators = 3, 
+  cores = 5
+  )
+```
+
+``` r
+attributes |> head() |> knitr::kable()
+```
+
+| annotator_id | variable_name        | variable_type | Construct                                     | Variable_Concept_Category | Source_Terminology | Codes                                    | Timing_Logic                             | Complexity_Indicator | Complex_Definition | Data_Type   | Ascertainment_Source                     | Ascertainment_Notes                                                         | pmid     |
+|:--|:----|:---|:-------|:----|:---|:------|:------|:----|:---|:--|:------|:-----------|:--|
+| OSG1216      | VITAMIN D DEFICIENCY | EXPOSURE      | Deficiency of vitamin D in the body           | Nutrition/Metabolism      | Not applicable     | Not applicable                           | Assessed during the study period         | No                   | Not applicable     | Categorical | Laboratory tests                         | Serum concentration of 25-hydroxyvitamin D \< 30 ng/mL considered deficient | 28817241 |
+| OSG1216      | AGE                  | COVARIATE     | Chronological measure of time since birth     | Demographics              | Not applicable     | Not applicable                           | Recorded at the time of study enrollment | No                   | Not applicable     | Continuous  | Self-reported or administrative records  | Verified by checking official documents when possible                       | 28817241 |
+| OSG1216      | GENDER               | COVARIATE     | Biological sex of the individual              | Demographics              | Not applicable     | Not applicable                           | Recorded at the time of study enrollment | No                   | Not applicable     | Categorical | Self-reported or administrative records  | Gender identity collected during initial assessments                        | 28817241 |
+| OSG1216      | EDUCATION            | COVARIATE     | Highest level of formal education completed   | Socioeconomic             | Not applicable     | Not applicable                           | Recorded at the time of study enrollment | No                   | Not applicable     | Categorical | Self-reported or administrative records  | Level of education verified during recruitment                              | 28817241 |
+| OSG1216      | ETHNICITY            | COVARIATE     | Ethnic or racial background of the individual | Socioeconomic             | Not applicable     | Not applicable                           | Recorded at the time of study enrollment | No                   | Not applicable     | Categorical | Self-reported or administrative records  | Ethnicity information self-reported by participants                         | 28817241 |
+| OSG1216      | HYPERTENSION         | COVARIATE     | High blood pressure condition                 | Cardiovascular Health     | ICD-10             | I10 for Essential (primary) hypertension | Recorded at each study visit             | No                   | Not applicable     | Categorical | Medical records or clinical measurements | Blood pressure measurements used for diagnosis                              | 28817241 |
+
+### Notes on evaluating attribute annotations
+
+> Attributes are less straightforward to extract. Lots more variation in
+> extracted values. Will require an alternative approach. ??
+
+> Text embeddings for responses – via HuggingFace API, eg. Okay, then
+> what?
+
+``` r
+attributes <- list(
+  "annotator_id",
+  "variable_name",
+  "variable_type",
+  "Construct",
+  "Variable_Concept_Category",
+  "Source_Terminology",
+  "Codes",
+  "Timing_Logic",
+  "Complexity_Indicator",
+  "Complex_Definition",
+  "Data_Type",
+  "Ascertainment_Source",
+  "Ascertainment_Notes",
+  "pmid"
+)
+```
+
+## Evaluation Framework
 
 ### Precision Calculation:
 
@@ -766,14 +832,14 @@ precision <- variables |>
 precision |> head() |> knitr::kable()
 ```
 
-| pmid     | variable_name        | variable_type | annotators | var_freq | agree_rate |
-|:--------|:-------------------|:-------------|----------:|--------:|----------:|
-| 28817241 | HEART FAILURE        | OUTCOME       |          5 |        3 |        0.6 |
-| 28817241 | VITAMIN D DEFICIENCY | EXPOSURE      |          5 |        5 |        1.0 |
-| 28817241 | AGE                  | COVARIATE     |          5 |        5 |        1.0 |
-| 28817241 | GENDER               | COVARIATE     |          5 |        5 |        1.0 |
-| 28817241 | EDUCATION            | COVARIATE     |          5 |        5 |        1.0 |
-| 28817241 | ETHNICITY            | COVARIATE     |          5 |        5 |        1.0 |
+| pmid     | variable_name         | variable_type | annotators | var_freq | precision |
+|:--------|:--------------------|:-------------|----------:|--------:|---------:|
+| 28817241 | RISK OF HEART FAILURE | OUTCOME       |          5 |        1 |       0.2 |
+| 28817241 | VITAMIN D DEFICIENCY  | EXPOSURE      |          5 |        5 |       1.0 |
+| 28817241 | AGE                   | COVARIATE     |          5 |        5 |       1.0 |
+| 28817241 | GENDER                | COVARIATE     |          5 |        5 |       1.0 |
+| 28817241 | EDUCATION             | COVARIATE     |          5 |        5 |       1.0 |
+| 28817241 | ETHNICITY             | COVARIATE     |          5 |        5 |       1.0 |
 
 ### Consensus Variables:
 
@@ -809,11 +875,11 @@ agreement |> knitr::kable()
 
 | pmid     | kappa |   z | p_value | annotators | type | token | min_vars | max_vars | mean_vars | rate_consensus | n_consensus_vars |
 |:-----|----:|---:|-----:|------:|---:|----:|-----:|-----:|------:|---------:|----------:|
-| 28817241 | 0.441 | 6.4 | 0.00000 |          5 |   21 |    94 |       18 |       19 |      18.8 |          0.966 |               19 |
-| 29276677 | 0.067 | 1.0 | 0.32172 |          5 |   20 |    41 |        5 |       10 |       8.6 |          0.462 |                5 |
-| 29330643 | 0.101 | 2.1 | 0.04005 |          5 |   40 |    87 |        8 |       25 |      19.9 |          0.689 |               17 |
-| 29574441 | 0.039 | 0.7 | 0.46250 |          5 |   27 |    64 |        8 |       15 |      13.3 |          0.299 |                4 |
-| 29596471 | 0.056 | 1.1 | 0.27493 |          5 |   31 |    82 |       11 |       21 |      17.4 |          0.647 |               15 |
+| 28817241 | 0.509 | 7.9 | 0.00000 |          5 |   24 |    99 |       19 |       21 |      19.8 |          0.929 |               19 |
+| 29276677 | 0.121 | 1.9 | 0.06126 |          5 |   22 |    44 |        7 |       10 |       9.0 |          0.591 |                7 |
+| 29330643 | 0.412 | 7.2 | 0.00000 |          5 |   30 |    96 |       17 |       25 |      19.7 |          0.812 |               17 |
+| 29574441 | 0.052 | 0.9 | 0.37578 |          5 |   27 |    61 |        7 |       15 |      12.8 |          0.590 |               10 |
+| 29596471 | 0.181 | 3.3 | 0.00103 |          5 |   28 |    61 |        9 |       20 |      13.5 |          0.460 |                6 |
 
 ### Accuracy of LLM-Based Annotations:
 
@@ -869,6 +935,58 @@ agreement |> knitr::kable()
 |   Consensus LLM annotations using   |
 |   Cohen's Kappa)                    |
 +------------------------------------+
+```
+
+## Categories from shiny app
+
+``` r
+sample_characteristics <- list(
+  Biology_Genetics = list(
+    "Biology/Genetics"
+  ),
+  Family_Planning = list(
+    "1st trimester care",
+    "Use of ART"
+  ),
+  Health_Behaviors = list(
+    "Drinking",
+    "Smoking",
+    "Substance use"
+  ),
+  Implicit_Racial_Bias = list(
+    "Structural racism"
+  ),
+  Reproductive_Hx = list(
+    "Hx of abortion",
+    "Hx of pregnancy loss",
+    "Hx of perinatal death",
+    "Hx of preterm birth",
+    "Parity/Gravidity",
+    "Previous C-section",
+    "Previous birth weight",
+    "Prior pregnancy outcome"
+  ),
+  Sociodemographics = list(
+    "Geographic area",
+    "Maternal age",
+    "Marital status",
+    "Race/ethnicity",
+    "Paternity"
+  ),
+  Socioeconomics = list(
+    "Education",
+    "Insurance",
+    "Income assistance",
+    "SES category"
+  ),
+  Underlying_Health = list(
+    "Chronic diseases",
+    "Diabetes",
+    "Hypertension",
+    "Maternal weight",
+    "Maternal BMI"
+  )
+)
 ```
 
 ## Summary

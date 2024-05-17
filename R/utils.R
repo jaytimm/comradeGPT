@@ -173,13 +173,12 @@
                             user_message, 
                             system_message, 
                             model, 
-                            process_type, 
-                            variables) {
+                            process_type) {
   
   
   prompt_messages <- .build_prompt(process_type, 
                                    row$text, 
-                                   variables, 
+                                   row$variables, 
                                    user_message, 
                                    system_message)
   

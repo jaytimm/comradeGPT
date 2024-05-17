@@ -48,7 +48,8 @@ cmd_process_document <- function(pmid,
   
   # Create a data frame to hold pmid and repeated texts for each annotator
   text_df <- data.table::data.table(pmid = rep(pmid, annotators), 
-                                    text = rep(text, annotators))
+                                    text = rep(text, annotators),
+                                    variables = rep(variables, annotators))
   
   # Setup a parallel cluster
   cl <- parallel::makeCluster(cores)
@@ -65,8 +66,7 @@ cmd_process_document <- function(pmid,
                                       # ".openai_chat_completions",
                                       # ".is_valid_json",
                                       
-                                      "process_type",
-                                      "variables"),
+                                      "process_type"),
                           envir = environment())
   
   # Apply the function in parallel with a progress bar
@@ -75,8 +75,7 @@ cmd_process_document <- function(pmid,
                                                                       user_message, 
                                                                       system_message, 
                                                                       model,
-                                                                      process_type,
-                                                                      variables), 
+                                                                      process_type), 
                                   cl = cl)
   
   # Stop the cluster
