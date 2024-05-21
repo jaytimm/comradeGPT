@@ -29,7 +29,7 @@ EXPOSURE: These are the variables representing factors analyzed for their potent
 
 OUTCOME: This is the variable being predicted or explained in the study. It is the main effect or condition the research aims to understand through its relation to various exposures. Every study has at least ONE outcome variable.
 
-COVARIATE: These variables are included in the analysis to control for confounding factors that might influence both the exposure and the outcome. Common covariates include age, gender, and socioeconomic status.
+COVARIATE: These variables are included in the analysis to control for confounding factors that might influence both the exposure and the outcome. Common covariates include age, gender, and socioeconomic status. Treat Race and Ethnicity as a single variable labeled as RACE.
 
 Please list only the fundamental concept of each variable, excluding any specific details related to age, timing, or measurement intervals. Focus on the general category or type of each variable to ensure the output is concise and universally applicable, without being tied to a particular time frame or demographic detail.
 
@@ -56,12 +56,14 @@ Extract each covariate variable as a separate JSON object. Specifically, avoid g
 
 Extract the OUTCOME variable first. Only after the OUTCOME variable has been extracted, extract the EXPOSURE and COVARIATE variables.
 
+Do NOT use acronymns in output -- use full, expanded names for variables.
+
 STUDY:',
 
 
-user_extract_attributes = 'You are tasked with creating a JSON output that includes structured data for a predefined LIST OF VARIABLES. Each entry in the JSON array should correspond to one variable, capturing various essential details such as its type and key descriptive attributes and features.
+user_extract_attributes = 'You are tasked with extracting attributes for each variable in a predefined LIST OF VARIABLES from a PubMed article. 
 
-Variable features include:
+Variable attributes include:
 
 Construct:
 Definition: Represents the biomedical concept used in research to denote the broader variable of interest.
@@ -106,14 +108,26 @@ Example: Blood pressure measured using a standard sphygmomanometer after 5 minut
 
 
 OUTPUT:
-Please provide ouput in a JSON array. The number of objects in the output JSON should equal the number of variables in the LIST OF VARIABLES. Each object should be structured with straightforward, flat hierarchy, avoiding nested structures.
-
-"variable_name" and "variable_type" in output should be the same as variable_name and varable_type in LIST OF VARIABLES.
+Please provide ouput in a JSON array. The number of objects in the output JSON should equal the number of variables in the LIST OF VARIABLES. "variable_name" and "variable_type" in output should be the same as variable_name and varable_type in LIST OF VARIABLES.
 
 
-An incomplete example:
+Example output:
 
 [
+  {
+    "variable_name": "VITAMIN D DEFICIENCY",
+    "variable_type": "EXPOSURE",
+    "Construct": "Deficiency in vitamin D levels",
+    "Variable_Concept_Category": "Biomarkers",
+    "Source_Terminology": "Not applicable",
+    "Codes": "Not applicable",
+    "Timing_Logic": "Measured at the time of study enrollment",
+    "Complexity_Indicator": "No",
+    "Complex_Definition": "Not applicable",
+    "Data_Type": "Categorical",
+    "Ascertainment_Source": "Laboratory tests",
+    "Ascertainment_Notes": "Measured using serum concentration of 25‐hydroxyvitamin D"
+  },
   {
     "variable_name": "AGE",
     "variable_type": "COVARIATE",
@@ -128,10 +142,50 @@ An incomplete example:
     "Ascertainment_Source": "Self-reported or administrative records",
     "Ascertainment_Notes": "Verified by checking official documents when possible"
   },
-  
-  # ... 
   {
-    "variable_name": "DIABETES",
+    "variable_name": "GENDER",
+    "variable_type": "COVARIATE",
+    "Construct": "Biological sex of the individual",
+    "Variable_Concept_Category": "Demographics",
+    "Source_Terminology": "Not applicable",
+    "Codes": "Not applicable",
+    "Timing_Logic": "Recorded at the time of study enrollment",
+    "Complexity_Indicator": "No",
+    "Complex_Definition": "Not applicable",
+    "Data_Type": "Categorical",
+    "Ascertainment_Source": "Self-reported",
+    "Ascertainment_Notes": "Recorded during patient interviews"
+  },
+  {
+    "variable_name": "EDUCATION",
+    "variable_type": "COVARIATE",
+    "Construct": "Level of formal education completed",
+    "Variable_Concept_Category": "Socioeconomics",
+    "Source_Terminology": "Not applicable",
+    "Codes": "Not applicable",
+    "Timing_Logic": "Recorded at the time of study enrollment",
+    "Complexity_Indicator": "No",
+    "Complex_Definition": "Not applicable",
+    "Data_Type": "Categorical",
+    "Ascertainment_Source": "Self-reported",
+    "Ascertainment_Notes": "Recorded during patient interviews"
+  },
+  {
+    "variable_name": "HYPERTENSION",
+    "variable_type": "COVARIATE",
+    "Construct": "Condition characterized by high blood pressure",
+    "Variable_Concept_Category": "Underlying Health",
+    "Source_Terminology": "ICD-10",
+    "Codes": "I10 for Essential (primary) hypertension",
+    "Timing_Logic": "Measured during routine check-ups",
+    "Complexity_Indicator": "No",
+    "Complex_Definition": "Not applicable",
+    "Data_Type": "Categorical",
+    "Ascertainment_Source": "Medical records",
+    "Ascertainment_Notes": "Diagnosed based on blood pressure measurements"
+  },
+  {
+    "variable_name": "DIABETES MELLITUS",
     "variable_type": "COVARIATE",
     "Construct": "Metabolic disorder characterized by high blood sugar levels",
     "Variable_Concept_Category": "Underlying Health",
@@ -143,8 +197,67 @@ An incomplete example:
     "Data_Type": "Categorical",
     "Ascertainment_Source": "Electronic Health Records (EHR)",
     "Ascertainment_Notes": "Confirmed by laboratory glucose tests and medication records"
+  },
+
+  {
+    "variable_name": "ALCOHOLISM",
+    "variable_type": "COVARIATE",
+    "Construct": "Addiction to the consumption of alcoholic beverages",
+    "Variable_Concept_Category": "Lifestyle",
+    "Source_Terminology": "ICD-10",
+    "Codes": "F10 for Alcohol use disorders",
+    "Timing_Logic": "Assessed during routine check-ups",
+    "Complexity_Indicator": "No",
+    "Complex_Definition": "Not applicable",
+    "Data_Type": "Categorical",
+    "Ascertainment_Source": "Self-reported",
+    "Ascertainment_Notes": "Recorded during patient interviews"
+  },
+  {
+    "variable_name": "OBESITY",
+    "variable_type": "COVARIATE",
+    "Construct": "Excess body fat that presents a risk to health",
+    "Variable_Concept_Category": "Underlying Health",
+    "Source_Terminology": "ICD-10",
+    "Codes": "E66 for Obesity",
+    "Timing_Logic": "Measured during routine check-ups",
+    "Complexity_Indicator": "No",
+    "Complex_Definition": "Not applicable",
+    "Data_Type": "Categorical",
+    "Ascertainment_Source": "Medical records",
+    "Ascertainment_Notes": "Diagnosed based on BMI and clinical assessments"
+  },
+  {
+    "variable_name": "ETHNICITY",
+    "variable_type": "COVARIATE",
+    "Construct": "Self-identified group based on shared cultural traits or national origin",
+    "Variable_Concept_Category": "Demographics",
+    "Source_Terminology": "Not applicable",
+    "Codes": "Not applicable",
+    "Timing_Logic": "Recorded at the time of study enrollment",
+    "Complexity_Indicator": "No",
+    "Complex_Definition": "Not applicable",
+    "Data_Type": "Categorical",
+    "Ascertainment_Source": "Self-reported",
+    "Ascertainment_Notes": "Recorded during patient interviews"
+  },
+
+  {
+    "variable_name": "RISK OF HEART FAILURE",
+    "variable_type": "OUTCOME",
+    "Construct": "Likelihood of developing heart failure",
+    "Variable_Concept_Category": "Clinical Outcome",
+    "Source_Terminology": "Not applicable",
+    "Codes": "Not applicable",
+    "Timing_Logic": "Assessed during routine check-ups",
+    "Complexity_Indicator": "Yes",
+    "Complex_Definition": "Based on Health ABC HF score",
+    "Data_Type": "Categorical",
+    "Ascertainment_Source": "Clinical assessments",
+    "Ascertainment_Notes": "Determined using the Health ABC scale"
   }
 ]
+
 
 
 Ensure there is no trailing comma after the last element. DO NOT include the "```json " code block notation in the output.',
@@ -187,71 +300,86 @@ DO NOT include the "```json " code block notation in the output.
 
 STUDY: ',
 
+
 user_extract_popchars = '
 
 Task: Extract and categorize all details regarding the sample characteristics used in the medical study presented below.
 
 Instructions:
+  
+Extract Sample Characteristics: Carefully read the study to identify and extract characteristics of study sample. Treat each characteristic independently, even if presented in a grouped format.
 
-Identify Sample Characteristics: Carefully read the study to identify detailed descriptions of the sample characteristics. These can include demographic, geographic, temporal, and other relevant population characteristics. Ensure each characteristic is considered independently, even if presented in a list or grouped with others.
+Extract "Categories": "Categories" refer to specific groups within a characteristic, used to segment participants. For instance, if the study segments participants by age, you might see categories such as "Under 18", "19-35", "36-55", and "Over 55". For geographic distribution, categories could be "Urban", "Suburban", "Rural". Health-related categories might include "With Diabetes", "Without Diabetes".
 
-Use Direct Text Extraction: To ensure precision and consistency across multiple annotators, extract the language directly from the text. Do not paraphrase or interpret beyond what is necessary to classify the characteristic.
+Use Direct Text Extraction: Extract the text directly from the study without paraphrasing. Only interpret to classify the characteristic accurately.
 
-Classifications:
+Define class: For each identified sample characteristic, classify it into one of the following classes: "Demographic", "Geographic", "Health-Related", or "Other".
+  
+Output Requirements:
 
-Demographic Information: Information related to the population\'s age, gender, ethnicity, socioeconomic status, and educational background.
-Geographic Characteristics: Details on the specific regions, urban vs. rural settings, and relevant climate or environmental conditions where the study was conducted.
-Health-Related Factors: Prevalence of certain medical conditions, behavioral aspects, and access to healthcare services.
-Sampling Method Details: Type of sampling, inclusion and exclusion criteria, sample size, and how it was determined.
-Temporal Aspects: Timeframe and periodicity of data collection.
-Other Relevant Characteristics: Occupational data, lifestyle factors, and psychosocial factors.
-List each characteristic individually: Avoid grouping variables under broad categories. Specify each factor clearly and separately.
+Structured Details: For each sample characteristic identified, extract categories, counts and percentages. If not specified, use "NA".
 
-Output Format:
-  Provide the results as a JSON array. Each object in the array should include four elements: "characteristic_name", "characteristic_type", "explanation", and "value".
+Output Format: The output must be a JSON array. Each object in the array must include the following fields: "characteristic", "class", "explanation", "categories", "counts", and "percentages".
 
-Example format:
+Example Format:
 
 [
   {
-    "characteristic_name": "Age range",
-    "characteristic_type": "Demographic Information",
-    "explanation": "The range of ages of the participants in the study.",
-    "value": "18-65"
+    "characteristic": "Age",
+    "class": "Demographic",
+    "explanation": "The distribution of age groups among the elderly participants.",
+    "categories": ["60-69", "70-79", "80+"],
+    "counts": [46, 43, 9],
+    "percentages": ["46.6%", "43.8%", "9.5%"]
   },
   {
-    "characteristic_name": "Gender distribution",
-    "characteristic_type": "Demographic Information",
-    "explanation": "The proportion of male and female participants in the study.",
-    "value": "50% female, 50% male"
+    "characteristic": "Gender",
+    "class": "Demographic",
+    "explanation": "The distribution of male and female participants.",
+    "categories": ["Male", "Female"],
+    "counts": [48, 152],
+    "percentages": ["24.1%", "75.9%"]
   },
   {
-    "characteristic_name": "Ethnicity",
-    "characteristic_type": "Demographic Information",
-    "explanation": "The racial or ethnic background of the participants.",
-    "value": "40% Caucasian, 30% Hispanic, 20% African American, 10% Asian"
+    "characteristic": "Region",
+    "class": "Geographic",
+    "explanation": "The distribution of participants by region.",
+    "categories": ["North", "South", "East", "West"],
+    "counts": [20, 30, 25, 25],
+    "percentages": ["20%", "30%", "25%", "25%"]
   },
   {
-    "characteristic_name": "Specific regions",
-    "characteristic_type": "Geographic Characteristics",
-    "explanation": "The regions or countries where the study was conducted.",
-    "value": "Urban areas in the Northeastern United States"
+    "characteristic": "Prevalence of Diabetes",
+    "class": "Health-Related",
+    "explanation": "The distribution of participants with and without a diagnosis of diabetes.",
+    "categories": ["With Diabetes", "Without Diabetes"],
+    "counts": [15, 85],
+    "percentages": ["15%", "85%"]
   },
   {
-    "characteristic_name": "Prevalence of medical conditions",
-    "characteristic_type": "Health-Related Factors",
-    "explanation": "The percentage of participants with certain medical conditions.",
-    "value": "15% with diabetes"
-  }
+    "characteristic": "Employment Status",
+    "class": "Other",
+    "explanation": "The employment status of participants.",
+    "categories": ["Employed", "Unemployed", "Retired"],
+    "counts": [100, 40, 60],
+    "percentages": ["50%", "20%", "30%"]
+  },
+  {
+    "characteristic": "Prevalence of Hypertension",
+    "class": "Health-Related",
+    "explanation": "The distribution of participants with and without a diagnosis of hypertension.",
+    "categories": ["With Hypertension", "Without Hypertension"],
+    "counts": [50, 150],
+    "percentages": ["25%", "75%"]
+}
+
 ]
 
-Ensure there is no trailing comma after the last element.
-DO NOT include the "```json " code block notation in the output.
+Ensure there is no trailing comma after the last element. Output should not include any code block notation (e.g., \'```json\').
 
 STUDY:
+
 ',
-
-
 
 
 user_extract_summary = '
@@ -261,25 +389,26 @@ Instructions:
 
 Identify Study Characteristics: Carefully read the study to identify key details such as study design, population size, covariate definitions, major results, effect size, confidence intervals, and p-value. Ensure each characteristic is considered independently, even if presented in a list or grouped with others.
 
-Use Direct Text Extraction: To ensure precision and consistency across multiple annotators, extract the language directly from the text. Do not paraphrase or interpret beyond what is necessary to classify the characteristic.
+Use Direct Text Extraction: To ensure precision and consistency across multiple annotators, extract the language directly from the text. 
 
-Classifications:
+
+Characteristics:
 
 Study Design: Provides a comprehensive description of the study\'s methodology, capturing specific design types and other pertinent information such as study duration, setting, and interventions or exposures assessed.
 
-Population Size: Contains the total number of participants in the study, specifying the number of cases and controls, if applicable.
+Population Size: Contains the total number of participants in the study, specifying the number of cases and controls, if applicable. Data type: INTEGER.
 
-Covariate Definitions in Maintext: Indicates whether the main text of the research article mentions covariates used to adjust for confounding factors. Annotators mark "Y" if covariate details are explicitly stated, "N" if not mentioned, and "S" if details are in supplementary materials.
+Covariate Definitions in Maintext: Indicates whether the main text of the research article mentions covariates used to adjust for confounding factors. Annotators mark "Y" if covariate details are explicitly stated, "N" if not mentioned, and "S" if details are in supplementary materials. Data type: STRING.
 
-Major Results: Summarizes the primary findings of the study in a concise manner.
+Major Results: Summarizes the primary findings of the study in a concise manner. Data type: STRING.
 
-Effect Size: Provides the quantitative measure of the strength of the association between the exposure and the outcome.
+Effect Size: Provides the quantitative measure of the strength of the association between the exposure and the outcome. Data type: NUMERIC.
 
-Lower Confidence Interval: Contains the lower boundary of the confidence interval for the effect size, indicating the range of uncertainty surrounding the estimate.
+Lower Confidence Interval: Contains the lower boundary of the confidence interval for the effect size, indicating the range of uncertainty surrounding the estimate. Data type: NUMERIC
 
-Upper Confidence Interval: Contains the upper boundary of the confidence interval for the effect size, indicating the range of uncertainty surrounding the estimate.
+Upper Confidence Interval: Contains the upper boundary of the confidence interval for the effect size, indicating the range of uncertainty surrounding the estimate. Data type: NUMERIC
 
-P-Value: Contains the p-value of the study findings, indicating the likelihood that the observed association is not due to chance.
+P-Value: Contains the p-value of the study findings, indicating the likelihood that the observed association is not due to chance. Data type: NUMERIC
 
 Output Format:
   Provide the results as a JSON array. Each object in the array should include three elements: "field", "value", and "explanation".
@@ -294,7 +423,7 @@ Example format:
     },
     {
       "field": "Population Size",
-      "value": "800 participants, with 400 cases and 400 controls",
+      "value": "800",
       "explanation": "The study comprised 800 participants, with 400 cases and 400 controls."
     },
     {

@@ -22,67 +22,62 @@
 
 cmd_process_document <- function(pmid, 
                                  text,
-                                 
                                  process_type = c('classify_texts',
-                                                  
                                                   'extract_summary',
                                                   'extract_variables',
                                                   'extract_attributes',
                                                   'extract_popchars',
-                                                  
-                                                  'manual'
-                                                  ## Table A
-                                 ), 
-                                 
+                                                  'manual'), 
                                  variables = NULL,
-                                 
                                  user_message = NULL, 
                                  system_message = NULL,
-                                 
                                  cores = 5,
                                  annotators = 1,
                                  model = 'gpt-3.5-turbo') {
-  
-  
-  
   
   # Create a data frame to hold pmid and repeated texts for each annotator
   text_df <- data.table::data.table(pmid = rep(pmid, annotators), 
                                     text = rep(text, annotators),
                                     variables = rep(variables, annotators))
   
-  # Setup a parallel cluster
-  cl <- parallel::makeCluster(cores)
+  if (cores > 1) {
+    # Setup a parallel cluster
+    cl <- parallel::makeCluster(cores)
+    
+    # Export necessary variables to the cluster
+    parallel::clusterExport(cl, 
+                            varlist = c("user_message", 
+                                        "system_message", 
+                                        "model",
+                                        "process_type"),
+                            envir = environment())
+    
+    # Apply the function in parallel with a progress bar
+    llm_output <- pbapply::pblapply(X = split(text_df, seq(nrow(text_df))), 
+                                    FUN = function(row) .complete_chat1(row, 
+                                                                        user_message, 
+                                                                        system_message, 
+                                                                        model,
+                                                                        process_type), 
+                                    cl = cl)
+    
+    # Stop the cluster
+    parallel::stopCluster(cl)
+  } else {
+
+    # Sequential processing with a progress bar
+    llm_output <- pbapply::pblapply(split(text_df, seq(nrow(text_df))), 
+                                    function(row) .complete_chat1(row, 
+                                                                  user_message, 
+                                                                  system_message, 
+                                                                  model,
+                                                                  process_type))
+  }
   
-  # Export necessary variables to the cluster
-  parallel::clusterExport(cl, 
-                          varlist = c("user_message", 
-                                      "system_message", 
-                                      "model",
-                                      
-                                      ## likely won't be necessary as package -- 
-                                      # ".complete_chat1",
-                                      # ".build_prompt",
-                                      # ".openai_chat_completions",
-                                      # ".is_valid_json",
-                                      
-                                      "process_type"),
-                          envir = environment())
-  
-  # Apply the function in parallel with a progress bar
-  llm_output <- pbapply::pblapply(X = split(text_df, seq(nrow(text_df))), 
-                                  FUN = function(row) .complete_chat1(row, 
-                                                                      user_message, 
-                                                                      system_message, 
-                                                                      model,
-                                                                      process_type), 
-                                  cl = cl)
-  
-  # Stop the cluster
-  parallel::stopCluster(cl)
-  
+  # Generate random IDs for each element in llm_output
   names(llm_output) <- .generate_random_ids(length(llm_output))
   
+  # Process the output
   processed_list <- lapply(llm_output, function(element) {
     response_list <- jsonlite::fromJSON(element$response)
     response_df <- data.table::as.data.table(response_list)
@@ -91,14 +86,44 @@ cmd_process_document <- function(pmid,
   })
   
   # Combine all data tables into a single data table
-  df <- data.table::rbindlist(processed_list, idcol = 'annotator_id')
+  df <- data.table::rbindlist(processed_list, idcol = 'annotator_id', fill=TRUE)
   
-  # df[, c('pmid',
-  #        'annotator_id', 
-  #        'variable_name', 
-  #        'variable_type', 
-  #        'explanation', 
-  #        'mesh_descriptor')]
+  # Melt the data.table to long format
+  if(process_type == 'extract_attributes'){
+  
+    df <- data.table::melt(df,
+                           id.vars = c("pmid",
+                                       "annotator_id",
+                                       "variable_name",
+                                       "variable_type"),
+  
+                          measure.vars = c("Construct",
+                                           "Variable_Concept_Category",
+                                           "Source_Terminology",
+                                           "Codes",
+                                           "Timing_Logic",
+                                           "Complexity_Indicator",
+                                           "Complex_Definition",
+                                           "Data_Type",
+                                           "Ascertainment_Source",
+                                           "Ascertainment_Notes"))
+  }
+
+  if(process_type == 'extract_popchars'){
+    df <- do.call(rbind, lapply(seq_along(df$categories), function(i) {
+      data.frame(
+        pmid = df$pmid[i],
+        annotator_id = df$annotator_id[i],
+        characteristic = df$characteristic[i],
+        class = df$class[i],
+        # explanation = df$explanation[i],
+        categories = unlist(df$categories[i]),
+        counts = unlist(df$counts[i]),
+        percentages = unlist(df$percentages[i])
+      )  }))
+  }
+  
+  
   
   return(df)
 }
