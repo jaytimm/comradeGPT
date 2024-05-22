@@ -109,19 +109,19 @@ cmd_process_document <- function(pmid,
                                            "Ascertainment_Notes"))
   }
 
-  if(process_type == 'extract_popchars'){
-    df <- do.call(rbind, lapply(seq_along(df$categories), function(i) {
-      data.frame(
-        pmid = df$pmid[i],
-        annotator_id = df$annotator_id[i],
-        characteristic = df$characteristic[i],
-        class = df$class[i],
-        # explanation = df$explanation[i],
-        categories = unlist(df$categories[i]),
-        counts = unlist(df$counts[i]),
-        percentages = unlist(df$percentages[i])
-      )  }))
-  }
+  # if(process_type == 'extract_popchars'){
+  #   df <- do.call(rbind, lapply(seq_along(df$categories), function(i) {
+  #     data.frame(
+  #       pmid = df$pmid[i],
+  #       annotator_id = df$annotator_id[i],
+  #       characteristic = df$characteristic[i],
+  #       class = df$class[i],
+  #       # explanation = df$explanation[i],
+  #       categories = unlist(df$categories[i]),
+  #       counts = unlist(df$counts[i]),
+  #       percentages = unlist(df$percentages[i])
+  #     )  }))
+  #}
   
   
   
