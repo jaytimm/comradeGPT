@@ -49,6 +49,7 @@
 #' result <- cmd_calc_agreement(variables, cols)
 #' print(result)
 #' @export
+
 cmd_calc_agreement <- function(x, cols, consensus_threshold = 0.6) {
   # Convert to data.table and remove duplicates
   variables <- unique(data.table::as.data.table(x))
@@ -76,9 +77,12 @@ cmd_calc_agreement <- function(x, cols, consensus_threshold = 0.6) {
   # Calculate the number of annotators per pmid
   variables[, annotators := data.table::uniqueN(annotator_id), by = pmid]
   
+  # Combine specified columns into a single variable for frequency calculation
+  variables[, variable_combined := do.call(paste, .SD), .SDcols = cols]
+  
   # Calculate the frequency of each variable across annotations
-  variables[, var_freq := .N, by = .(pmid, variable_name, variable_type)]
-  variables[, var_consensus := round(var_freq / annotators, 2), by = .(pmid, variable_name, variable_type)]
+  variables[, var_freq := .N, by = .(pmid, variable_combined)]
+  variables[, var_consensus := round(var_freq / annotators, 2), by = .(pmid, variable_combined)]
   
   # Calculate the consensus rate for each annotation
   variables[, n_vars_cons := sum(var_consensus >= consensus_threshold), by = .(pmid, annotator_id)]
@@ -87,27 +91,26 @@ cmd_calc_agreement <- function(x, cols, consensus_threshold = 0.6) {
   # Summarize the results for each pmid
   summary_stats <- variables[, .(
     annotators = mean(annotators),
-    type = length(unique(variable_name)),
+    type = length(unique(variable_combined)),
     token = .N,
     min_vars = min(n_vars),
     max_vars = max(n_vars),
     mean_vars = round(mean(n_vars), 1),
     rate_consensus = round(mean(rate_consensus), 3),
-    n_consensus_vars = length(unique(variable_name[var_consensus >= consensus_threshold]))
+    n_consensus_vars = length(unique(variable_combined[var_consensus >= consensus_threshold]))
   ), by = pmid]
   
   # Create a binary pivot table for each pmid and the specified columns
-  variables[, variable := do.call(paste, .SD), .SDcols = cols]
-  pivot_data <- dcast(unique(variables[, .(pmid, annotator_id, variable)]),
-                      pmid + variable ~ annotator_id, 
-                      value.var = "variable", fun.aggregate = function(x) as.integer(length(x) > 0), fill = 0)
+  pivot_data <- dcast(unique(variables[, .(pmid, annotator_id, variable_combined)]),
+                      pmid + variable_combined ~ annotator_id, 
+                      value.var = "variable_combined", fun.aggregate = function(x) as.integer(length(x) > 0), fill = 0)
   
   # Split pivot_data into a list of matrices per pmid
   pivot_list <- split(pivot_data, by = "pmid")
   
   # Calculate Fleiss' Kappa for each pmid and store the results in a list
   kappa_results <- lapply(pivot_list, function(df) {
-    matrix_data <- as.matrix(df[, -c("pmid", "variable"), with = FALSE])
+    matrix_data <- as.matrix(df[, -c("pmid", "variable_combined"), with = FALSE])
     matrix_data <- matrix_data[, colSums(matrix_data) > 0, drop = FALSE]
     
     kappa_info <- .fleiss_kappa(matrix_data)
