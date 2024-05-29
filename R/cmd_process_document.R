@@ -65,6 +65,8 @@ cmd_process_document <- function(pmid,
     parallel::stopCluster(cl)
   } else {
 
+    # for_llm <- list() 
+    # for(i in 2:10){
     # Sequential processing with a progress bar
     llm_output <- pbapply::pblapply(split(text_df, seq(nrow(text_df))), 
                                     function(row) .complete_chat1(row, 
@@ -72,12 +74,17 @@ cmd_process_document <- function(pmid,
                                                                   system_message, 
                                                                   model,
                                                                   process_type))
+  #   for_llm[[i]] <- llm_output
+  #   print(i)
   }
-  
+  # 
+  # llm_output <- unlist(for_llm, recursive = FALSE)
+  #llm_output[3] <- NA
   # Generate random IDs for each element in llm_output
+    
   names(llm_output) <- .generate_random_ids(length(llm_output))
   
-  # Process the output
+  # # Process the output
   processed_list <- lapply(llm_output, function(element) {
     response_list <- jsonlite::fromJSON(element$response)
     response_df <- data.table::as.data.table(response_list)
@@ -86,17 +93,20 @@ cmd_process_document <- function(pmid,
   })
   
   # Combine all data tables into a single data table
-  df <- data.table::rbindlist(processed_list, idcol = 'annotator_id', fill=TRUE)
   
-  # Melt the data.table to long format
+  #df <- data.table::rbindlist(processed_list, idcol = 'annotator_id', fill=TRUE)
+  df <- llm_output
+  
+  
+  # # Melt the data.table to long format
   if(process_type == 'extract_attributes'){
-  
+
     df <- data.table::melt(df,
                            id.vars = c("pmid",
                                        "annotator_id",
                                        "variable_name",
                                        "variable_type"),
-  
+
                           measure.vars = c("Construct",
                                            "Variable_Concept_Category",
                                            "Source_Terminology",
@@ -108,20 +118,8 @@ cmd_process_document <- function(pmid,
                                            "Ascertainment_Source",
                                            "Ascertainment_Notes"))
   }
+  # 
 
-  # if(process_type == 'extract_popchars'){
-  #   df <- do.call(rbind, lapply(seq_along(df$categories), function(i) {
-  #     data.frame(
-  #       pmid = df$pmid[i],
-  #       annotator_id = df$annotator_id[i],
-  #       characteristic = df$characteristic[i],
-  #       class = df$class[i],
-  #       # explanation = df$explanation[i],
-  #       categories = unlist(df$categories[i]),
-  #       counts = unlist(df$counts[i]),
-  #       percentages = unlist(df$percentages[i])
-  #     )  }))
-  #}
   
   
   
