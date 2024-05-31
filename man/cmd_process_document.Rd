@@ -8,7 +8,7 @@ cmd_process_document(
   pmid,
   text,
   process_type = c("classify_texts", "extract_summary", "extract_variables",
-    "extract_attributes", "extract_popchars", "manual"),
+    "extract_attributes", "extract_popchars", "normalize_variables", "manual"),
   variables = NULL,
   user_message = NULL,
   system_message = NULL,

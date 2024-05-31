@@ -147,6 +147,12 @@
            system_message = if (!is.null(system_message)) system_message else comradeGPT::cmd_prompts$system_extract_variables
          ),
          
+         normalize_variables = list(
+           user_message = paste(comradeGPT::cmd_prompts$user_normalize_variables, text, sep = '\n\n'),
+           system_message = if (!is.null(system_message)) system_message else comradeGPT::cmd_prompts$system_extract_variables
+         ),
+         
+         
          manual = list(
            user_message = paste(user_message, text, sep = '\n\n'),
            system_message = system_message

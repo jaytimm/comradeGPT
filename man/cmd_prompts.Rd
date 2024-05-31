@@ -5,7 +5,7 @@
 \alias{cmd_prompts}
 \title{Command Prompts for comradeGPT}
 \format{
-An object of class \code{list} of length 7.
+An object of class \code{list} of length 8.
 }
 \usage{
 cmd_prompts

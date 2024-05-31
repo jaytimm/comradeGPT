@@ -61,206 +61,142 @@ Do NOT use acronymns in output -- use full, expanded names for variables.
 STUDY:',
 
 
-user_extract_attributes = 'You are tasked with extracting attributes for each variable in a predefined LIST OF VARIABLES from a PubMed article. 
+
+# Each object should have 12 key-value pairs: "variable_name", "variable_type", "construct", "variable_concept_category", "source_terminology", "codes", "timing_logic", "complexity_indicator", "complex_definition", "data_type", "ascertainment_source", and "ascertainment_notes".
+
+
+user_extract_attributes = 'You are tasked with extracting ELEVEN attributes for each variable in a predefined LIST OF VARIABLES from a PubMed article. 
 
 Variable attributes include:
 
+Variable Type:
+Definition: Exposure variables are assessed for their impact on outcomes and include factors such as lifestyle, environment, or genetics, with each study requiring at least one. Outcome variables are the primary focus of a study, intended to be explained or predicted, and covariate variables control for confounders like age, gender, and socioeconomic status,
+Value type: string ["EXPOSURE", "OUTCOME", "COVARIATE"]
+
 Construct:
 Definition: Represents the biomedical concept used in research to denote the broader variable of interest.
-Example: "Body Mass Index (BMI)" as a construct for "Obesity".
+Example: "Body Mass Index (BMI)" as a construct for "Obesity". 
+Value type: string or NA.
 
 Variable Concept Category:
 Definition: Describes broader categories that individual constructs belong to, from genetics to socioeconomics.
-Example: "Biology/Genetics" for APOEe4 status.
+Example: "Biology/Genetics" for APOEe4 status. 
+Value type: string or NA.
 
 Source Terminology:
 Definition: Specifies terminologies or classification systems used for clarity in variable definitions.
 Example: "LOINC" for laboratory tests.
+Value type: string or NA.
 
 Codes:
 Definition: Contains specific codes from medical terminologies that correspond to the variable.
 Example: "E11" for Type 2 Diabetes Mellitus in ICD-10.
+Value type: string or NA.
 
 Timing Logic:
 Definition: Outlines criteria for when and how data related to the variable is collected and analyzed.
 Example: Blood pressure measurements taken annually over 20 years for a study on hypertension.
+Value type: string or NA.
 
 Complexity Indicator:
-Definition: Identifies variables with complex definitions derived from multiple sources. As Yes or No.
+Definition: Identifies variables with complex definitions derived from multiple sources. 
 Example: Major depressive disorder determined by diagnostic codes and prescription data.
+Value type: string ["yes", "no"] or NA.
 
 Complex Definition:
 Definition: Describes intricate phenotype definitions for complex scenarios.
 Example: Diabetes definition involving multiple criteria including medication history.
+Value type: string or NA.
 
 Data Type:
 Definition: Classifies the nature of data for each variable, influencing analysis methods.
 Example: "Continuous" for variables like "Blood Pressure".
+Value type: string ["continuous", "categorical", "binary"] or NA.
 
 Ascertainment Source:
 Definition: Indicates the source or method by which the variable\'s data was obtained.
 Example: "EHR" for data from Electronic Health Records.
+Value type: string or NA.
 
 Ascertainment Notes:
 Definition: Contains a simple description of how the variable was ascertained.
 Example: Blood pressure measured using a standard sphygmomanometer after 5 minutes of rest.
-
+Value type: string or NA.
 
 
 OUTPUT:
-Please provide ouput in a JSON array. The number of objects in the output JSON should equal the number of variables in the LIST OF VARIABLES. "variable_name" and "variable_type" in output should be the same as variable_name and varable_type in LIST OF VARIABLES.
 
+For each variable attribute, set the value to \'NA\' if it is not explicitly mentioned or cannot be directly derived from the article. However, for attributes such as \'variable_concept_category\', \'construct\', and \'data_type\', you may infer these attributes based on widely accepted definitions.
 
-Example output:
+Please provide ouput in a JSON array. The number of objects in the output JSON should equal the number of variables in the LIST OF VARIABLES. "variable_name" in output JSON should be the same as the "variable_name" in the LIST OF VARIABLES.
+
+An incomplete example of well-structured output:
 
 [
   {
     "variable_name": "VITAMIN D DEFICIENCY",
     "variable_type": "EXPOSURE",
-    "Construct": "Deficiency in vitamin D levels",
-    "Variable_Concept_Category": "Biomarkers",
-    "Source_Terminology": "Not applicable",
-    "Codes": "Not applicable",
-    "Timing_Logic": "Measured at the time of study enrollment",
-    "Complexity_Indicator": "No",
-    "Complex_Definition": "Not applicable",
-    "Data_Type": "Categorical",
-    "Ascertainment_Source": "Laboratory tests",
-    "Ascertainment_Notes": "Measured using serum concentration of 25‐hydroxyvitamin D"
-  },
-  {
-    "variable_name": "AGE",
-    "variable_type": "COVARIATE",
-    "Construct": "Chronological measure of time since birth",
-    "Variable_Concept_Category": "Demographics",
-    "Source_Terminology": "Not applicable",
-    "Codes": "Not applicable",
-    "Timing_Logic": "Recorded at the time of study enrollment",
-    "Complexity_Indicator": "No",
-    "Complex_Definition": "Not applicable",
-    "Data_Type": "Continuous",
-    "Ascertainment_Source": "Self-reported or administrative records",
-    "Ascertainment_Notes": "Verified by checking official documents when possible"
-  },
-  {
-    "variable_name": "GENDER",
-    "variable_type": "COVARIATE",
-    "Construct": "Biological sex of the individual",
-    "Variable_Concept_Category": "Demographics",
-    "Source_Terminology": "Not applicable",
-    "Codes": "Not applicable",
-    "Timing_Logic": "Recorded at the time of study enrollment",
-    "Complexity_Indicator": "No",
-    "Complex_Definition": "Not applicable",
-    "Data_Type": "Categorical",
-    "Ascertainment_Source": "Self-reported",
-    "Ascertainment_Notes": "Recorded during patient interviews"
-  },
-  {
-    "variable_name": "EDUCATION",
-    "variable_type": "COVARIATE",
-    "Construct": "Level of formal education completed",
-    "Variable_Concept_Category": "Socioeconomics",
-    "Source_Terminology": "Not applicable",
-    "Codes": "Not applicable",
-    "Timing_Logic": "Recorded at the time of study enrollment",
-    "Complexity_Indicator": "No",
-    "Complex_Definition": "Not applicable",
-    "Data_Type": "Categorical",
-    "Ascertainment_Source": "Self-reported",
-    "Ascertainment_Notes": "Recorded during patient interviews"
+    "construct": "Deficiency in vitamin D levels",
+    "variable_concept_category": "Biomarkers",
+    "source_terminology": "NA",
+    "codes": "NA",
+    "timing_logic": "Measured at the time of study enrollment",
+    "complexity_indicator": "no",
+    "complex_definition": "NA",
+    "data_type": "categorical",
+    "ascertainment_source": "Laboratory tests",
+    "ascertainment_notes": "Measured using serum concentration of 25‐hydroxyvitamin D"
   },
   {
     "variable_name": "HYPERTENSION",
     "variable_type": "COVARIATE",
-    "Construct": "Condition characterized by high blood pressure",
-    "Variable_Concept_Category": "Underlying Health",
-    "Source_Terminology": "ICD-10",
-    "Codes": "I10 for Essential (primary) hypertension",
-    "Timing_Logic": "Measured during routine check-ups",
-    "Complexity_Indicator": "No",
-    "Complex_Definition": "Not applicable",
-    "Data_Type": "Categorical",
-    "Ascertainment_Source": "Medical records",
-    "Ascertainment_Notes": "Diagnosed based on blood pressure measurements"
+    "construct": "Condition characterized by high blood pressure",
+    "variable_concept_category": "Underlying Health",
+    "source_terminology": "ICD-10",
+    "codes": "I10 for Essential (primary) hypertension",
+    "timing_logic": "Measured during routine check-ups",
+    "complexity_indicator": "no",
+    "complex_definition": "NA",
+    "data_type": "categorical",
+    "ascertainment_source": "Medical records",
+    "ascertainment_notes": "Diagnosed based on blood pressure measurements"
   },
+  
+  # ...
+  
   {
     "variable_name": "DIABETES MELLITUS",
     "variable_type": "COVARIATE",
-    "Construct": "Metabolic disorder characterized by high blood sugar levels",
-    "Variable_Concept_Category": "Underlying Health",
-    "Source_Terminology": "ICD-10",
-    "Codes": "E11 for Type 2 Diabetes Mellitus",
-    "Timing_Logic": "Measured annually during routine check-ups",
-    "Complexity_Indicator": "Yes",
-    "Complex_Definition": "Based on glucose levels, HbA1c measurements, and/or medication usage",
-    "Data_Type": "Categorical",
-    "Ascertainment_Source": "Electronic Health Records (EHR)",
-    "Ascertainment_Notes": "Confirmed by laboratory glucose tests and medication records"
+    "construct": "Metabolic disorder characterized by high blood sugar levels",
+    "variable_concept_category": "Underlying Health",
+    "source_terminology": "ICD-10",
+    "codes": "E11 for Type 2 Diabetes Mellitus",
+    "timing_logic": "Measured annually during routine check-ups",
+    "complexity_indicator": "yes",
+    "complex_definition": "Based on glucose levels, HbA1c measurements, and/or medication usage",
+    "data_type": "categorical",
+    "ascertainment_source": "Electronic Health Records (EHR)",
+    "ascertainment_notes": "Confirmed by laboratory glucose tests and medication records"
   },
-
-  {
-    "variable_name": "ALCOHOLISM",
-    "variable_type": "COVARIATE",
-    "Construct": "Addiction to the consumption of alcoholic beverages",
-    "Variable_Concept_Category": "Lifestyle",
-    "Source_Terminology": "ICD-10",
-    "Codes": "F10 for Alcohol use disorders",
-    "Timing_Logic": "Assessed during routine check-ups",
-    "Complexity_Indicator": "No",
-    "Complex_Definition": "Not applicable",
-    "Data_Type": "Categorical",
-    "Ascertainment_Source": "Self-reported",
-    "Ascertainment_Notes": "Recorded during patient interviews"
-  },
-  {
-    "variable_name": "OBESITY",
-    "variable_type": "COVARIATE",
-    "Construct": "Excess body fat that presents a risk to health",
-    "Variable_Concept_Category": "Underlying Health",
-    "Source_Terminology": "ICD-10",
-    "Codes": "E66 for Obesity",
-    "Timing_Logic": "Measured during routine check-ups",
-    "Complexity_Indicator": "No",
-    "Complex_Definition": "Not applicable",
-    "Data_Type": "Categorical",
-    "Ascertainment_Source": "Medical records",
-    "Ascertainment_Notes": "Diagnosed based on BMI and clinical assessments"
-  },
-  {
-    "variable_name": "ETHNICITY",
-    "variable_type": "COVARIATE",
-    "Construct": "Self-identified group based on shared cultural traits or national origin",
-    "Variable_Concept_Category": "Demographics",
-    "Source_Terminology": "Not applicable",
-    "Codes": "Not applicable",
-    "Timing_Logic": "Recorded at the time of study enrollment",
-    "Complexity_Indicator": "No",
-    "Complex_Definition": "Not applicable",
-    "Data_Type": "Categorical",
-    "Ascertainment_Source": "Self-reported",
-    "Ascertainment_Notes": "Recorded during patient interviews"
-  },
-
   {
     "variable_name": "RISK OF HEART FAILURE",
     "variable_type": "OUTCOME",
-    "Construct": "Likelihood of developing heart failure",
-    "Variable_Concept_Category": "Clinical Outcome",
-    "Source_Terminology": "Not applicable",
-    "Codes": "Not applicable",
-    "Timing_Logic": "Assessed during routine check-ups",
-    "Complexity_Indicator": "Yes",
-    "Complex_Definition": "Based on Health ABC HF score",
-    "Data_Type": "Categorical",
-    "Ascertainment_Source": "Clinical assessments",
-    "Ascertainment_Notes": "Determined using the Health ABC scale"
+    "construct": "Likelihood of developing heart failure",
+    "variable_concept_category": "Clinical Outcome",
+    "source_terminology": "NA",
+    "codes": "NA",
+    "timing_logic": "Assessed during routine check-ups",
+    "complexity_indicator": "yes",
+    "complex_definition": "Based on Health ABC HF score",
+    "data_type": "categorical",
+    "ascertainment_source": "Clinical assessments",
+    "ascertainment_notes": "Determined using the Health ABC scale"
   }
 ]
 
 
-
-Ensure there is no trailing comma after the last element. DO NOT include the "```json " code block notation in the output.',
+Ensure there is no trailing comma after the last element. 
+DO NOT include the "```json " code block notation in the output.',
 
 
 
@@ -461,6 +397,75 @@ Example format:
 Ensure there is no trailing comma after the last element. DO NOT include the "```json " code block notation in the output.
 
 STUDY:
+',
+
+
+
+user_normalize_variables = '
+
+TASK: Normalize the following variable names to a consistent format using standardized medical terminology. This involves addressing variations in spelling, plural forms, acronyms, synonyms, and phrasing, and simplifying lengthy and complex names to their CORE CONCEPTS by removing unnecessary modification terms. For each normalized variable, determine the most appropriate Medical Subject Headings (MeSH) descriptor using your specialized knowledge.
+
+
+Examples of Normalization
+
+Variations in Spelling, Plural Forms, Acronyms, Synonyms, and Phrasing:
+"smoking" and "smoking status" should be unified as "SMOKING".
+"body-mass index", "BMI", and "body mass indices" should be unified as "BODY MASS INDEX".
+"amyloid-β status", "amyloid-β positivity/negativity", and "amyloid beta status" should be unified as "AMYLOID STATUS".
+"gender" and "sex" should be unified as "SEX".
+
+
+Simplification of Lengthy and Complex Variable Names:
+"LEFT VENTRICULAR END-DIASTOLIC VOLUME INDEX" should be simplified to "LEFT VENTRICULAR VOLUME".
+"FASTING PLASMA GLUCOSE CONCENTRATION AT MORNING" should be simplified to "PLASMA GLUCOSE".
+"BLOOD PRESSURE DURING EXERCISE TEST" should be simplified to "BLOOD PRESSURE".
+"SERUM C-REACTIVE PROTEIN LEVEL IN ADULTS" should be simplified to "C-REACTIVE PROTEIN".
+"PRE-OPERATIVE BODY MASS INDEX" should be simplified to "BODY MASS INDEX".
+Output Format:
+
+Provide the results as a JSON array. Each object in the array should include three elements: "variable_name", "variable_concept", and "mesh_descriptor". 
+
+Ensure that the "mesh_descriptor" accurately reflects the standardized medical terminology for each concept.
+
+Use MesH DescriptorName not MeSH TermName.
+
+If the variable name does not make sense or if it has no equivalent MeSH descriptor, set the mesh_descriptor element in the JSON output to "NA".
+
+An incomplete example of well-structured output:
+
+[
+{
+"variable_name": "SMOKING STATUS",
+"variable_concept": "SMOKING",
+"mesh_descriptor": "Smoking"
+},
+{
+"variable_name": "BMI",
+"variable_concept": "BODY MASS INDEX",
+"mesh_descriptor": "Body Mass Index"
+},
+{
+"variable_name": "AMYLOID-Β POSITIVITY/NEGATIVITY",
+"variable_concept": "AMYLOID STATUS",
+"mesh_descriptor": "Amyloid beta-Peptides"
+},
+{
+"variable_name": "CHILDHOOD COGNITION SCORE",
+"variable_concept": "CHILDHOOD COGNITION",
+"mesh_descriptor": "Cognition"
+},
+{
+"variable_name": "GENDER",
+"variable_concept": "SEX",
+"mesh_descriptor": "Sex"
+}
+]
+
+Ensure there is no trailing comma after the last element. DO NOT include the "```json " code block notation in the output.
+
+VARIABLE NAMES:
+
 '
+
 
 )

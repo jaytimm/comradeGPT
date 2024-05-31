@@ -27,6 +27,7 @@ cmd_process_document <- function(pmid,
                                                   'extract_variables',
                                                   'extract_attributes',
                                                   'extract_popchars',
+                                                  'normalize_variables',
                                                   'manual'), 
                                  variables = NULL,
                                  user_message = NULL, 
@@ -84,8 +85,28 @@ cmd_process_document <- function(pmid,
     
   names(llm_output) <- .generate_random_ids(length(llm_output))
   
-  # # Process the output
+  # # # Process the output
+  # processed_list <- lapply(llm_output, function(element) {
+  #   response_list <- jsonlite::fromJSON(element$response)
+  #   response_df <- data.table::as.data.table(response_list)
+  #   response_df[, pmid := element$pmid]
+  #   return(response_df)
+  # })
+  
   processed_list <- lapply(llm_output, function(element) {
+    # Handle potentially invalid JSON safely
+    valid_json <- tryCatch({
+      jsonlite::validate(element$response)
+    }, error = function(e) {
+      FALSE  # Return FALSE if an error occurs during JSON validation
+    })
+    
+    # If 'response' is NA or not a valid JSON, return an empty data.table with 'pmid'
+    if (is.na(element$response) || !valid_json) {
+      return(data.table(pmid = element$pmid))
+    }
+    
+    # Parse the JSON and convert it to a data.table
     response_list <- jsonlite::fromJSON(element$response)
     response_df <- data.table::as.data.table(response_list)
     response_df[, pmid := element$pmid]
@@ -93,32 +114,34 @@ cmd_process_document <- function(pmid,
   })
   
   # Combine all data tables into a single data table
+  df <- data.table::rbindlist(processed_list, idcol = 'annotator_id', fill=TRUE)
+  data.table::setcolorder(df, c("pmid", setdiff(names(df), "pmid")))
   
-  #df <- data.table::rbindlist(processed_list, idcol = 'annotator_id', fill=TRUE)
-  df <- llm_output
-  
-  
-  # # Melt the data.table to long format
-  if(process_type == 'extract_attributes'){
-
-    df <- data.table::melt(df,
-                           id.vars = c("pmid",
-                                       "annotator_id",
-                                       "variable_name",
-                                       "variable_type"),
-
-                          measure.vars = c("Construct",
-                                           "Variable_Concept_Category",
-                                           "Source_Terminology",
-                                           "Codes",
-                                           "Timing_Logic",
-                                           "Complexity_Indicator",
-                                           "Complex_Definition",
-                                           "Data_Type",
-                                           "Ascertainment_Source",
-                                           "Ascertainment_Notes"))
+  for (col in names(df)) {
+    df[get(col) == "NA", (col) := NA]
   }
+  
+  # # # Melt the data.table to long format
+  # if(process_type == 'extract_attributes'){
   # 
+  #   df <- data.table::melt(df,
+  #                          id.vars = c("pmid",
+  #                                      "annotator_id",
+  #                                      "variable_name",
+  #                                      "variable_type"),
+  # 
+  #                         measure.vars = c("Construct",
+  #                                          "Variable_Concept_Category",
+  #                                          "Source_Terminology",
+  #                                          "Codes",
+  #                                          "Timing_Logic",
+  #                                          "Complexity_Indicator",
+  #                                          "Complex_Definition",
+  #                                          "Data_Type",
+  #                                          "Ascertainment_Source",
+  #                                          "Ascertainment_Notes"))
+  # }
+  # # 
 
   
   
