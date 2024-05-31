@@ -1,7 +1,8 @@
 
+##
+remotes::install_github("jaytimm/comradeGPT")
 
 # LOAD relevant packages
-remotes::install_github("jaytimm/comradeGPT")
 if (!require(pacman)) install.packages("pacman")
 pacman::p_load(puremoe,
                
@@ -60,7 +61,7 @@ abstracts0 <- abstracts |>
 
 ###
 pmclist <- puremoe::data_pmc_list(use_persistent_storage = T)
-pmc_pmids <- pmclist[PMID %in% PMIDs$PMID]
+pmc_pmids <- pmclist[PMID %in% pmids]
 
 pmc_fulltext <- pmc_pmids$fpath |> 
   puremoe::get_records(endpoint = 'pmc_fulltext', cores = 4) 
@@ -239,11 +240,11 @@ setwd(output_dir)
 write.csv(gpt_sumstats_agreement, 'gpt_sumstats_agreement.csv', row.names = F)
 write.csv(gpt_sumstats_precision, 'gpt_sumstats_precision.csv', row.names = F)
 
-write.csv(gpt_sumstats_agreement, 'gpt_variables_agreement.csv', row.names = F)
-write.csv(gpt_sumstats_precision, 'gpt_variables_precision.csv', row.names = F)
+write.csv(gpt_variables_agreement, 'gpt_variables_agreement.csv', row.names = F)
+write.csv(gpt_variables_precision, 'gpt_variables_precision.csv', row.names = F)
 
-write.csv(gpt_sumstats_agreement, 'gpt_attributes_agreement.csv', row.names = F)
-write.csv(gpt_sumstats_precision, 'gpt_attributes_precision.csv', row.names = F)
+write.csv(gpt_attributes_agreement, 'gpt_attributes_agreement.csv', row.names = F)
+write.csv(gpt_attributes_precision, 'gpt_attributes_precision.csv', row.names = F)
 
 
 

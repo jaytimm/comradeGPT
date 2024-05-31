@@ -330,24 +330,42 @@ Use Direct Text Extraction: To ensure precision and consistency across multiple 
 
 Characteristics:
 
-Study Design: Provides a comprehensive description of the study\'s methodology, capturing specific design types and other pertinent information such as study duration, setting, and interventions or exposures assessed.
+Study Design: 
+Definition: Provides a comprehensive description of the study\'s methodology, capturing specific design types and other pertinent information such as study duration, setting, and interventions or exposures assessed.
+Data type: string or NA.
 
-Population Size: Contains the total number of participants in the study, specifying the number of cases and controls, if applicable. Data type: INTEGER.
+Population Size: 
+Definition: Contains the total number of participants in the study, specifying the number of cases and controls, if applicable. 
+Data type: integer or NA.
 
-Covariate Definitions in Maintext: Indicates whether the main text of the research article mentions covariates used to adjust for confounding factors. Annotators mark "Y" if covariate details are explicitly stated, "N" if not mentioned, and "S" if details are in supplementary materials. Data type: STRING.
+Covariate Definitions in Maintext: 
+Definition: Indicates whether the main text of the research article mentions covariates used to adjust for confounding factors. Annotators mark "Y" if covariate details are explicitly stated, "N" if not mentioned, and "S" if details are in supplementary materials. 
+Data type: string ["Y", "N", "S"] or NA.
 
-Major Results: Summarizes the primary findings of the study in a concise manner. Data type: STRING.
+Major Results: 
+Definition: Summarizes the primary findings of the study in a concise manner. 
+Data type: string.
 
-Effect Size: Provides the quantitative measure of the strength of the association between the exposure and the outcome. Data type: NUMERIC.
+Effect Size: 
+Definition: Provides the quantitative measure of the strength of the association between the exposure and the outcome. 
+Data type: numeric or NA.
 
-Lower Confidence Interval: Contains the lower boundary of the confidence interval for the effect size, indicating the range of uncertainty surrounding the estimate. Data type: NUMERIC
+Lower Confidence Interval: 
+Definition: Contains the lower boundary of the confidence interval for the effect size, indicating the range of uncertainty surrounding the estimate. 
+Data type: numeric or NA.
 
-Upper Confidence Interval: Contains the upper boundary of the confidence interval for the effect size, indicating the range of uncertainty surrounding the estimate. Data type: NUMERIC
+Upper Confidence Interval: 
+Defintion: Contains the upper boundary of the confidence interval for the effect size, indicating the range of uncertainty surrounding the estimate. 
+Data type: numeric or NA.
 
-P-Value: Contains the p-value of the study findings, indicating the likelihood that the observed association is not due to chance. Data type: NUMERIC
+P-Value: 
+Definition: Contains the p-value of the study findings, indicating the likelihood that the observed association is not due to chance. 
+Data type: numeric or NA.
 
 Output Format:
-  Provide the results as a JSON array. Each object in the array should include three elements: "field", "value", and "explanation".
+Provide the results as a JSON array. Each object in the array should include three elements: "field", "value", and "explanation".
+
+For each study characteristic, set the value to \'NA\' if it is not explicitly mentioned or cannot be directly derived from the article.
 
 Example format:
 
