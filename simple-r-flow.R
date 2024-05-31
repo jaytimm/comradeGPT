@@ -24,7 +24,7 @@ input_dir <- '/home/jtimm/pCloudDrive/GitHub/packages/comradeGPT/input-pmids'
 setwd(input_dir)
 ris <- readLines('hypernatremia Ovid MEDLINE 20240524 line46.ris') # rbibutils
 pmids <- gsub('ID  - ', '',
-              grep('^ID ', ris, value = T))
+              grep('^ID ', ris, value = T)) # N = 85
 
 # PMIDs <- readxl::read_xlsx('results_filtered.xlsx')
 # pmids <- PMIDs$PMID
@@ -40,7 +40,7 @@ output_dir <- '/home/jtimm/Desktop/demo'
 
 n_annotators = 10
 n_cores = 30
-n_sample = 10
+n_sample = 30
 
 seed = 99
 
@@ -58,6 +58,7 @@ abstracts0 <- abstracts |>
   rename(text = abstract) |>
   select(pmid, section, text, id)
 
+abstracts1 <- abstracts |> select(-annotations) 
 
 ###
 pmclist <- puremoe::data_pmc_list(use_persistent_storage = T)
@@ -243,9 +244,10 @@ write.csv(gpt_sumstats_precision, 'gpt_sumstats_precision.csv', row.names = F)
 write.csv(gpt_variables_agreement, 'gpt_variables_agreement.csv', row.names = F)
 write.csv(gpt_variables_precision, 'gpt_variables_precision.csv', row.names = F)
 
-write.csv(gpt_attributes_agreement, 'gpt_attributes_agreement.csv', row.names = F)
-write.csv(gpt_attributes_precision, 'gpt_attributes_precision.csv', row.names = F)
+write.csv(gpt_atts_agreement, 'gpt_attributes_agreement.csv', row.names = F)
+write.csv(gpt_atts_precision, 'gpt_attributes_precision.csv', row.names = F)
 
+write.csv(abstracts1, 'abstracts.csv', row.names = F)
 
 
 
